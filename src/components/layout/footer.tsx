@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Hotel, Twitter, Instagram, Facebook } from 'lucide-react';
+import { CalendarCheck, Twitter, Instagram, Facebook } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -7,13 +7,13 @@ export function Footer() {
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Hotel className="w-6 h-6 text-primary" />
+            <CalendarCheck className="w-6 h-6 text-primary" />
             <span className="text-lg font-bold font-headline text-primary">
-              BookEase
+              Holiday Planner
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} BookEase. All rights reserved.
+            © {new Date().getFullYear()} Holiday Planner. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <Link href="#" aria-label="Twitter">

@@ -1,15 +1,38 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
-import { HotelSearchForm } from '@/components/hotel-search-form';
-import { Card, CardContent } from '@/components/ui/card';
-import { getHotels } from '@/lib/data';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import placeholderData from '@/lib/placeholder-images.json';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Car, Clapperboard, Map, Utensils } from 'lucide-react';
 
 const heroImage = placeholderData.placeholderImages.find(p => p.id === 'hero-background');
-const popularDestinations = getHotels({}).slice(0, 4);
+
+const planningActivities = [
+  {
+    title: "Vehicle Booking",
+    description: "Find the perfect ride for your adventure.",
+    icon: <Car className="w-8 h-8 text-primary" />,
+    href: "/holiday-planner",
+  },
+  {
+    title: "Sightseeing",
+    description: "Discover breathtaking places and create lasting memories.",
+    icon: <Map className="w-8 h-8 text-primary" />,
+    href: "/holiday-planner",
+  },
+  {
+    title: "Dining",
+    description: "Explore the best local cuisine and book tables.",
+    icon: <Utensils className="w-8 h-8 text-primary" />,
+    href: "/holiday-planner",
+  },
+  {
+    title: "Entertainment",
+    description: "Book tickets for movies, concerts, and more.",
+    icon: <Clapperboard className="w-8 h-8 text-primary" />,
+    href: "/holiday-planner",
+  },
+];
 
 export default function Home() {
   return (
@@ -28,59 +51,49 @@ export default function Home() {
         <div className="absolute inset-0 bg-primary/40" />
         <div className="relative z-10 container px-4 md:px-6 space-y-6">
           <h1 className="text-4xl md:text-6xl font-headline font-bold tracking-tight text-shadow-lg">
-            Your perfect stay, just a click away
+            Your Perfect Holiday, Planned
           </h1>
           <p className="max-w-3xl mx-auto text-lg md:text-xl text-shadow">
-            Discover and book unique hotels and homes around the world. Unforgettable experiences start here.
+            Craft your dream vacation with our all-in-one planning tool. Unforgettable experiences start here.
           </p>
-        </div>
-        <div className="absolute -bottom-24 md:-bottom-16 left-1/2 -translate-x-1/2 w-full max-w-6xl px-4">
-          <HotelSearchForm />
+           <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground mt-4">
+                <Link href="/holiday-planner">
+                    Start Planning <ArrowRight className="ml-2" />
+                </Link>
+            </Button>
         </div>
       </section>
 
-      <section className="container px-4 md:px-6 pt-16 md:pt-12">
+      <section className="container px-4 md:px-6">
         <div className="space-y-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-headline font-bold">Popular Destinations</h2>
+          <h2 className="text-3xl md:text-4xl font-headline font-bold">Plan Your Adventure</h2>
           <p className="max-w-2xl mx-auto text-muted-foreground">
-            Explore some of the most loved destinations and find your next adventure.
+            From car rentals to restaurant reservations, we've got you covered.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mt-10">
-          {popularDestinations.map((hotel) => {
-             const hotelImage = placeholderData.placeholderImages.find(p => p.id === hotel.images[0]);
-             return (
-              <Link href={`/hotels/${hotel.id}`} key={hotel.id}>
-                <Card className="overflow-hidden group hover:shadow-xl transition-shadow duration-300">
-                  <CardContent className="p-0">
-                    <div className="relative h-64">
-                       {hotelImage && (
-                        <Image
-                          src={hotelImage.imageUrl}
-                          alt={hotel.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          data-ai-hint={hotelImage.imageHint}
-                        />
-                       )}
-                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                       <div className="absolute bottom-0 left-0 p-4">
-                        <h3 className="font-bold text-lg text-white font-headline">{hotel.name}</h3>
-                        <p className="text-sm text-gray-200">{hotel.location}</p>
-                       </div>
+          {planningActivities.map((activity) => (
+            <Link href={activity.href} key={activity.title}>
+              <Card className="overflow-hidden group hover:shadow-xl transition-shadow duration-300 h-full flex flex-col text-center items-center p-6">
+                 <CardHeader className="p-0 mb-4">
+                    <div className="bg-primary/10 p-4 rounded-full">
+                        {activity.icon}
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            )
-          })}
+                </CardHeader>
+                <CardContent className="p-0 flex-grow">
+                  <CardTitle className="text-xl mb-2">{activity.title}</CardTitle>
+                  <p className="text-muted-foreground">{activity.description}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
         
         <div className="text-center mt-12">
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Link href="/hotels">
-                    Explore All Hotels <ArrowRight className="ml-2" />
+                <Link href="/holiday-planner">
+                    Go to Planner <ArrowRight className="ml-2" />
                 </Link>
             </Button>
         </div>

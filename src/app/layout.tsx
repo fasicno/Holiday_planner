@@ -5,8 +5,8 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'BookEase - Your perfect stay, just a click away.',
-  description: 'Find and book hotels online with ease. Best prices guaranteed.',
+  title: 'Holiday Planner - Your adventure starts here.',
+  description: 'Plan your perfect holiday with our all-in-one tool.',
 };
 
 export default function RootLayout({
