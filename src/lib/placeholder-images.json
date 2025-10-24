@@ -1,3 +1,70 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "A beautiful infinity pool overlooking a tropical ocean at sunset.",
+      "imageUrl": "https://images.unsplash.com/photo-1687834618283-1b9e12de54a7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxyZXNvcnQlMjBwb29sfGVufDB8fHx8MTc2MTI0MjUyNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "resort pool"
+    },
+    {
+      "id": "hotel-1-1",
+      "description": "Modern hotel room with a large bed and city view.",
+      "imageUrl": "https://images.unsplash.com/photo-1576354302919-96748cb8299e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzYxMjg3NTU0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hotel room"
+    },
+    {
+      "id": "hotel-1-2",
+      "description": "Hotel lobby with a contemporary design.",
+      "imageUrl": "https://images.unsplash.com/photo-1660557989695-14fac79c086d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxob3RlbCUyMGxvYmJ5fGVufDB8fHx8MTc2MTI5NzcwMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hotel lobby"
+    },
+    {
+      "id": "hotel-1-3",
+      "description": "Rooftop bar at a hotel with city skyline.",
+      "imageUrl": "https://images.unsplash.com/photo-1556463208-f8c2505e8299?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxyb29mdG9wJTIwYmFyfGVufDB8fHx8MTc2MTMwOTkxNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rooftop bar"
+    },
+    {
+      "id": "hotel-2-1",
+      "description": "A cozy beachfront villa with a private patio.",
+      "imageUrl": "https://images.unsplash.com/photo-1691677749553-1b6c76821339?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxiZWFjaCUyMHZpbGxhfGVufDB8fHx8MTc2MTI0ODgxNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach villa"
+    },
+    {
+      "id": "hotel-2-2",
+      "description": "Hammock between palm trees on a white sand beach.",
+      "imageUrl": "https://images.unsplash.com/photo-1555895357-1c6cae6c6cce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiZWFjaCUyMGhhbW1vY2t8ZW58MHx8fHwxNzYxMzE2MzgxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach hammock"
+    },
+    {
+      "id": "hotel-3-1",
+      "description": "A rustic cabin in a pine forest.",
+      "imageUrl": "https://images.unsplash.com/photo-1518107784960-eb57c673a7ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmb3Jlc3QlMjBjYWJpbnxlbnwwfHx8fDE3NjEyNDIzNjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "forest cabin"
+    },
+    {
+      "id": "hotel-3-2",
+      "description": "Interior of a cozy cabin with a fireplace.",
+      "imageUrl": "https://images.unsplash.com/photo-1727271173705-c9c6fad3acbb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjYWJpbiUyMGludGVyaW9yfGVufDB8fHx8MTc2MTIyMDIzNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cabin interior"
+    },
+    {
+      "id": "hotel-4-1",
+      "description": "Luxury desert resort with a pool.",
+      "imageUrl": "https://images.unsplash.com/photo-1641049950555-b379b0bb4f62?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkZXNlcnQlMjByZXNvcnR8ZW58MHx8fHwxNzYxMzI0MjI4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "desert resort"
+    },
+    {
+      "id": "hotel-5-1",
+      "description": "A charming hotel in a historic European city street.",
+      "imageUrl": "https://images.unsplash.com/photo-1709715460164-84abbe395f91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2l0eSUyMGhvdGVsfGVufDB8fHx8MTc2MTMxMzE3OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city hotel"
+    },
+    {
+      "id": "hotel-6-1",
+      "description": "Ski resort chalet with a view of snow-covered mountains.",
+      "imageUrl": "https://images.unsplash.com/photo-1705205148375-a845e74dbe4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxza2klMjByZXNvcnR8ZW58MHx8fHwxNzYxMzI0MjI5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ski resort"
+    }
+  ]
 }
