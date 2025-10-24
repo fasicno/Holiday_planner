@@ -12,9 +12,12 @@ export function Header() {
             BookEase
           </span>
         </Link>
-        <nav>
+        <nav className="flex items-center gap-2">
           <Button variant="ghost" asChild>
             <Link href="/hotels">All Stays</Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link href="/holiday-planner">Holiday Planner</Link>
           </Button>
         </nav>
       </div>
