@@ -12,9 +12,9 @@ import { z } from 'genkit';
 
 const GenerateImageInputSchema = z.object({
   prompt: z.string().describe('The core text prompt to generate an image from.'),
-  location: z.string().describe('The city or general area where the place is located.'),
-  name: z.string().describe('The name of the place.'),
-  description: z.string().describe('A short description of the place.'),
+  location: z.string().optional().describe('The city or general area where the place is located.'),
+  name: z.string().optional().describe('The name of the place.'),
+  description: z.string().optional().describe('A short description of the place.'),
 });
 export type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
 
@@ -34,16 +34,19 @@ const generateImageFlow = ai.defineFlow(
     outputSchema: GenerateImageOutputSchema,
   },
   async (input) => {
+    
+    const finalPrompt = `Generate a high-quality, photorealistic image for a travel website.
+
+    **Crucial Context:**
+    ${input.name ? `- **Place Name:** ${input.name}` : ''}
+    ${input.location ? `- **Location:** ${input.location}` : ''}
+    ${input.description ? `- **Description:** ${input.description}` : ''}
+    
+    **Image Goal:** Create an image that visually represents the following creative prompt, keeping the context above in mind: "${input.prompt}"`;
+
     const { media } = await ai.generate({
       model: 'googleai/imagen-4.0-fast-generate-001',
-      prompt: `Generate a high-quality, photorealistic image for a travel website.
-      
-      **Crucial Context:**
-      - **Place Name:** ${input.name}
-      - **Location:** ${input.location}
-      - **Description:** ${input.description}
-      
-      **Image Goal:** Create an image that visually represents the following creative prompt, keeping the context above in mind: "${input.prompt}"`,
+      prompt: finalPrompt,
     });
 
     const imageUrl = media.url;
