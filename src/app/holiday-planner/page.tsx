@@ -5,8 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Taxi } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useToast } from '@/hooks/use-toast';
+
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
@@ -17,6 +30,7 @@ export default function HolidayPlannerPage() {
   const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
   const [itinerary, setItinerary] = useState<ActivitySuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
     setItinerary((prev) => [...prev, suggestion]);
@@ -29,6 +43,13 @@ export default function HolidayPlannerPage() {
   const isSuggestionInItinerary = (suggestion: ActivitySuggestion) => {
     return itinerary.some((item) => item.name === suggestion.name);
   };
+  
+  const handleBookTaxi = (destination: ActivitySuggestion) => {
+    toast({
+      title: "Taxi Booked!",
+      description: `Your taxi to ${destination.name} is on its way.`,
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +62,11 @@ export default function HolidayPlannerPage() {
       setSuggestions(result.suggestions);
     } catch (error) {
       console.error("Failed to get suggestions:", error);
-      // Here you could show an error toast to the user
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem getting suggestions. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -159,14 +184,37 @@ export default function HolidayPlannerPage() {
             <CardContent className="p-6 space-y-4">
               {itinerary.map((item, index) => (
                 <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
-                  <div>
+                  <div className="flex-grow">
                     <h3 className="font-bold">{item.name}</h3>
                     <p className="text-sm text-muted-foreground">{item.address}</p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => handleRemoveFromItinerary(item)}>
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Remove from itinerary</span>
-                  </Button>
+                  <div className="flex items-center gap-2">
+                     <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Taxi className="mr-2" />
+                            Book Taxi
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will book a taxi to transport you to {item.name}.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleBookTaxi(item)}>Confirm</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                    <Button variant="ghost" size="icon" onClick={() => handleRemoveFromItinerary(item)}>
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Remove from itinerary</span>
+                    </Button>
+                  </div>
                 </div>
               ))}
             </CardContent>
