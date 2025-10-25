@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -61,6 +61,14 @@ export default function HolidayPlannerPage() {
     toast({
       title: "Redirecting to BookMyShow...",
       description: `Continue your booking for ${destination.name} on the BookMyShow website.`,
+    })
+  }
+  
+  const handleOrderFood = (destination: ActivitySuggestion) => {
+    window.open(`https://www.zomato.com/`, '_blank');
+    toast({
+      title: "Redirecting to Zomato...",
+      description: `Search for ${destination.name} on Zomato to order food.`,
     })
   }
 
@@ -219,7 +227,7 @@ export default function HolidayPlannerPage() {
                     <h3 className="font-bold">{item.name}</h3>
                     <p className="text-sm text-muted-foreground">{item.address}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
                     {item.activityType === 'movies' && (
                        <AlertDialog>
                           <AlertDialogTrigger asChild>
@@ -238,6 +246,28 @@ export default function HolidayPlannerPage() {
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction onClick={() => handleBookMovie(item)}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                    )}
+                     {(item.activityType === 'restaurants' || item.activityType === 'hotels') && (
+                       <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <UtensilsCrossed className="mr-2" />
+                              Order Food
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Order Food?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will open the Zomato website in a new tab to order food from {item.name}.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleOrderFood(item)}>Continue</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -286,3 +316,5 @@ export default function HolidayPlannerPage() {
     </div>
   );
 }
+
+    
