@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, ImageIcon } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
-import { generateImage, GenerateImageInput } from '@/ai/flows/generate-image-flow';
+import { generateImage } from '@/ai/flows/generate-image-flow';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,15 +33,15 @@ type Coordinates = {
   longitude: number;
 };
 
-const SuggestionCardImage = ({ suggestion }: { suggestion: ActivitySuggestion }) => {
+const SuggestionCardImage = ({ suggestion, location }: { suggestion: ActivitySuggestion, location: string }) => {
     const { imagePrompt, name, description } = suggestion;
-    const location = (suggestion as any).location || '';
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isImageLoading, setIsImageLoading] = useState(true);
   
     useEffect(() => {
       let isCancelled = false;
       const fetchImage = async () => {
+        if (!imagePrompt) return; // Don't fetch if there's no prompt
         setIsImageLoading(true);
         try {
           const imageResult = await generateImage({ 
@@ -98,15 +98,17 @@ const SuggestionCard = ({
   item,
   onAddToItinerary,
   isAdded,
-  distance
+  distance,
+  location,
 }: {
   item: ActivitySuggestion,
   onAddToItinerary: (suggestion: ActivitySuggestion) => void,
   isAdded: boolean,
-  distance: number | null
+  distance: number | null,
+  location: string,
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <SuggestionCardImage suggestion={item} />
+      <SuggestionCardImage suggestion={item} location={location} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -221,9 +223,7 @@ export default function HolidayPlannerPage() {
     setSuggestions([]);
     try {
       const result = await suggestActivities({ location, activityType });
-      // Add the location to each suggestion for the image generation context
-      const suggestionsWithLocation = result.suggestions.map(s => ({...s, location}));
-      setSuggestions(suggestionsWithLocation);
+      setSuggestions(result.suggestions);
     } catch (error) {
       console.error("Failed to get suggestions:", error);
       toast({
@@ -281,7 +281,7 @@ export default function HolidayPlannerPage() {
                 </Select>
               </div>
               <Button type="submit" disabled={isLoading} className="md:col-span-1 w-full bg-accent hover:bg-accent/90">
-                {isLoading ? (
+                {isLoading && !suggestions.length ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Generating...
@@ -297,9 +297,9 @@ export default function HolidayPlannerPage() {
           </CardContent>
         </Card>
 
-        {isLoading && (
+        {isLoading && !suggestions.length && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
                <Card key={i}>
                   <div className="h-48 w-full bg-muted animate-pulse rounded-t-lg"></div>
                   <CardHeader>
@@ -329,6 +329,7 @@ export default function HolidayPlannerPage() {
                   onAddToItinerary={handleAddToItinerary}
                   isAdded={isSuggestionInItinerary(item)}
                   distance={userCoords ? getDistance(userCoords, item) : null}
+                  location={location}
                 />
               ))}
             </div>

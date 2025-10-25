@@ -29,23 +29,6 @@ export async function generateImage(input: GenerateImageInput): Promise<Generate
   return await generateImageFlow(input);
 }
 
-const prompt = ai.definePrompt({
-    name: 'generateImagePrompt',
-    input: {schema: GenerateImageInputSchema},
-    output: {schema: GenerateImageOutputSchema},
-    prompt: `Generate a photorealistic image that visually represents the following location.
-
-Location: {{{location}}}
-Name: {{{name}}}
-Description: {{{description}}}
-Image Subject: {{{imagePrompt}}}
-
-Find a high-quality, professional photograph that best captures the essence of this place. Do not create an artistic rendering; it should look like a real photo.
-`,
-    model: 'googleai/imagen-4.0-fast-generate-001', 
-});
-
-
 const generateImageFlow = ai.defineFlow(
   {
     name: 'generateImageFlow',
@@ -55,7 +38,7 @@ const generateImageFlow = ai.defineFlow(
   async (input) => {
     const {media} = await ai.generate({
         model: 'googleai/imagen-4.0-fast-generate-001',
-        prompt: `A photorealistic, high-quality image of ${input.name} in ${input.location}. The scene should capture: ${input.description}. Focus on: ${input.imagePrompt}`,
+        prompt: `A photorealistic, high-quality, professional photograph of ${input.name} in ${input.location}. The scene should capture the essence of this description: "${input.description}". Specific focus on: ${input.imagePrompt}. Do not create an artistic rendering or illustration; it must look like a real photo from a travel magazine.`,
     });
 
     if (!media.url) {
