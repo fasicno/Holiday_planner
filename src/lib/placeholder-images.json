@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero-background",
-      "description": "A beautiful infinity pool overlooking a tropical ocean at sunset.",
-      "imageUrl": "https://images.unsplash.com/photo-1527142879-95b61a0b8226?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxyZXNvcnQlMjBwb29sfGVufDB8fHx8MTc2MTM1ODM5OHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "resort pool"
+      "description": "A person looking out over a vast mountain lake, representing adventure and travel planning.",
+      "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGxhbmRzY2FwZXxlbnwwfHx8fDE3NjE5MjU0ODF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mountain landscape"
     },
     {
       "id": "activity-1",
