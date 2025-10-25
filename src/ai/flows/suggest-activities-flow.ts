@@ -12,7 +12,7 @@ import {z} from 'genkit';
 
 const SuggestActivitiesInputSchema = z.object({
   location: z.string().describe('The city or area for the holiday.'),
-  activityType: z.enum(['restaurants', 'tourist attractions', 'hidden gems', 'shopping', 'movies', 'hotels']).describe('The type of activity to suggest.'),
+  activityType: z.enum(['restaurants', 'tourist attractions', 'hidden gems', 'shopping', 'movies', 'hotels', 'travel']).describe('The type of activity to suggest.'),
 });
 export type SuggestActivitiesInput = z.infer<typeof SuggestActivitiesInputSchema>;
 
@@ -42,6 +42,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert travel agent. A user is asking for suggestions for their holiday.
 
 Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions.
+
+For the 'travel' activity type, suggest major travel hubs like airports, train stations, and bus terminals.
 
 For each suggestion, provide a name, a short, compelling description, an address, a website URL if one is available, the precise latitude and longitude, and a few keywords to help find a relevant image for the location.
 

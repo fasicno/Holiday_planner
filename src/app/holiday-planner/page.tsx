@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, ImageIcon } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, ImageIcon, Plane, Train, Bus } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -189,6 +189,14 @@ export default function HolidayPlannerPage() {
     })
   }
 
+  const handleBookTravel = (medium: 'flight' | 'train' | 'bus', destination: ActivitySuggestion) => {
+    window.open(`https://www.makemytrip.com/`, '_blank');
+    toast({
+        title: `Redirecting to MakeMyTrip...`,
+        description: `Continue booking your ${medium} to ${destination.name}.`
+    });
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!location) return;
@@ -251,6 +259,7 @@ export default function HolidayPlannerPage() {
                     <SelectItem value="shopping">Shopping</SelectItem>
                     <SelectItem value="movies">Movies</SelectItem>
                     <SelectItem value="hotels">Hotels</SelectItem>
+                    <SelectItem value="travel">Travel</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -370,6 +379,19 @@ export default function HolidayPlannerPage() {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
+                      )}
+                      {item.activityType === 'travel' && (
+                          <>
+                            <Button variant="outline" size="sm" onClick={() => handleBookTravel('flight', item)}>
+                                <Plane className="mr-2" /> Book Flight
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleBookTravel('train', item)}>
+                                <Train className="mr-2" /> Book Train
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleBookTravel('bus', item)}>
+                                <Bus className="mr-2" /> Book Bus
+                            </Button>
+                          </>
                       )}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
