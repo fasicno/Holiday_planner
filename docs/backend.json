@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the BookEase application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The user's phone number"
+        },
+        "dateJoined": {
+          "type": "string",
+          "description": "The date that the user created an account.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "dateJoined"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information.  Path-based ownership is enforced via the 'userId' parameter, which must match request.auth.uid. This structure enforces authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, which must match the Firebase Auth UID."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This design prioritizes user authentication and data storage for the BookEase application. It leverages path-based ownership for user data to ensure security and simplifies access rules. Authorization Independence is achieved because User profiles are stored at a path that is directly correlated with the `uid` that is provided by `request.auth.uid`. Therefore, we do not require reading other user's data to secure another user's data.\n\nThe application supports QAPs because we segregate each user's data into their own document. Users can only access their own document using the `request.auth.uid` field."
+  }
+}
