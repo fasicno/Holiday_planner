@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, ImageIcon } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
-import placeholderData from '@/lib/placeholder-images.json';
+import { generateImage, GenerateImageInput } from '@/ai/flows/generate-image-flow';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,46 +33,57 @@ type Coordinates = {
   longitude: number;
 };
 
-const getBestPlaceholder = (imageHint: string) => {
-    if (!imageHint) return placeholderData.placeholderImages[0];
-  
-    const hintWords = imageHint.toLowerCase().split(' ');
-  
-    let bestMatch = placeholderData.placeholderImages[0];
-    let maxScore = 0;
-  
-    for (const placeholder of placeholderData.placeholderImages) {
-      const placeholderWords = placeholder.imageHint.toLowerCase().split(' ');
-      const score = hintWords.filter(word => placeholderWords.includes(word)).length;
-      if (score > maxScore) {
-        maxScore = score;
-        bestMatch = placeholder;
-      }
-    }
-  
-    return bestMatch;
-  };
-
 const SuggestionCardImage = ({ suggestion }: { suggestion: ActivitySuggestion }) => {
-    const { imagePrompt, name } = suggestion;
-    const [image, setImage] = useState<{imageUrl: string; description: string} | null>(null);
+    const { imagePrompt, name, description } = suggestion;
+    const location = (suggestion as any).location || '';
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [isImageLoading, setIsImageLoading] = useState(true);
   
     useEffect(() => {
-      const bestMatch = getBestPlaceholder(imagePrompt);
-      setImage(bestMatch);
-    }, [imagePrompt]);
+      let isCancelled = false;
+      const fetchImage = async () => {
+        setIsImageLoading(true);
+        try {
+          const imageResult = await generateImage({ 
+            imagePrompt,
+            location,
+            name,
+            description,
+           });
+          if (!isCancelled && imageResult.imageUrl) {
+            setImageUrl(imageResult.imageUrl);
+          }
+        } catch (error) {
+          console.error("Failed to generate image:", error);
+          if (!isCancelled) {
+             // Fallback to a generic placeholder if generation fails
+             setImageUrl('https://picsum.photos/seed/placeholder/600/400');
+          }
+        } finally {
+            if (!isCancelled) {
+                setIsImageLoading(false);
+            }
+        }
+      };
+  
+      fetchImage();
+  
+      return () => {
+        isCancelled = true;
+      };
+    }, [imagePrompt, location, name, description]);
   
     return (
       <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
-        {!image && (
+        {isImageLoading && (
           <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
-              <ImageIcon className="w-8 h-8" />
-              <span className="text-xs">Loading image...</span>
+            <ImageIcon className="w-8 h-8" />
+            <span className="text-xs">Generating image...</span>
           </div>
         )}
-        {image && (
+        {imageUrl && !isImageLoading && (
           <Image
-            src={image.imageUrl}
+            src={imageUrl}
             alt={name}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -210,7 +221,9 @@ export default function HolidayPlannerPage() {
     setSuggestions([]);
     try {
       const result = await suggestActivities({ location, activityType });
-      setSuggestions(result.suggestions);
+      // Add the location to each suggestion for the image generation context
+      const suggestionsWithLocation = result.suggestions.map(s => ({...s, location}));
+      setSuggestions(suggestionsWithLocation);
     } catch (error) {
       console.error("Failed to get suggestions:", error);
       toast({
