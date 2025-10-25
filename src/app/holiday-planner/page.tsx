@@ -390,7 +390,7 @@ export default function HolidayPlannerPage() {
                               <Plane className="mr-2" /> Book Flight
                           </Button>
                       )}
-                      {item.activityType === 'travel' && item.country === searchCountry && item.distance && item.distance <= 100 && (
+                      {item.activityType === 'travel' && item.country === searchCountry && item.distance && item.distance <= 100 && item.distance > 0 && (
                           <>
                             <Button variant="outline" size="sm" onClick={() => handleBookTravel('train', item)}>
                                 <Train className="mr-2" /> Book Train
