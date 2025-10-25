@@ -41,7 +41,7 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 3-5 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short description, an address, a website URL if one is available, and a URL for a relevant, high-quality image.
+For each suggestion, provide a name, a short description, an address, a website URL if one is available, and a valid, publicly accessible URL for a relevant, high-quality image.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,

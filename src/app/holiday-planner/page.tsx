@@ -97,7 +97,7 @@ export default function HolidayPlannerPage() {
 
   const SuggestionCard = ({ item }: { item: ActivitySuggestion }) => (
     <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg overflow-hidden">
-        {item.imageUrl && (
+      {item.imageUrl && (
         <div className="relative h-48 w-full">
           <Image
             src={item.imageUrl}
@@ -115,14 +115,14 @@ export default function HolidayPlannerPage() {
         <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
       </CardContent>
       <div className="p-6 pt-0 mt-auto">
-          <Button 
-            className="w-full"
-            onClick={(e) => handleAddToItinerary(e, item)}
-            disabled={isSuggestionInItinerary(item)}
-          >
-            <Plus className="mr-2"/>
-            Add to Itinerary
-          </Button>
+        <Button
+          className="w-full"
+          onClick={(e) => handleAddToItinerary(e, item)}
+          disabled={isSuggestionInItinerary(item)}
+        >
+          <Plus className="mr-2" />
+          Add to Itinerary
+        </Button>
       </div>
     </Card>
   );
@@ -223,7 +223,9 @@ export default function HolidayPlannerPage() {
                     <SuggestionCard item={item} />
                   </Link>
                 ) : (
-                  <SuggestionCard key={index} item={item} />
+                  <div key={index}>
+                    <SuggestionCard item={item} />
+                  </div>
                 )
               )}
             </div>
