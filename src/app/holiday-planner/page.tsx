@@ -199,7 +199,7 @@ export default function HolidayPlannerPage() {
                     <p className="text-sm text-muted-foreground">{item.address}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {item.activityType === 'movies' ? (
+                    {item.activityType === 'movies' && (
                        <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -220,28 +220,27 @@ export default function HolidayPlannerPage() {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
-                    ) : (
-                       <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Car className="mr-2" />
-                              Book Taxi
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleBookTaxi(item)}>Continue</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
                     )}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Car className="mr-2" />
+                          Book Taxi
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleBookTaxi(item)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
 
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveFromItinerary(item)}>
                       <X className="h-4 w-4" />
