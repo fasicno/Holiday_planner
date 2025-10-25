@@ -12,7 +12,7 @@ import {z} from 'genkit';
 
 const SuggestActivitiesInputSchema = z.object({
   location: z.string().describe('The city or area for the holiday.'),
-  activityType: z.enum(['restaurants', 'tourist attractions', 'hidden gems', 'shopping', 'movies']).describe('The type of activity to suggest.'),
+  activityType: z.enum(['restaurants', 'tourist attractions', 'hidden gems', 'shopping', 'movies', 'hotels']).describe('The type of activity to suggest.'),
 });
 export type SuggestActivitiesInput = z.infer<typeof SuggestActivitiesInputSchema>;
 
@@ -20,6 +20,7 @@ const ActivitySuggestionSchema = z.object({
     name: z.string().describe('The name of the place or activity.'),
     description: z.string().describe('A short, compelling description of the activity.'),
     address: z.string().describe('The approximate address or area.'),
+    website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -39,7 +40,7 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 3-5 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short description, and an address.
+For each suggestion, provide a name, a short description, an address, and a website URL if one is available.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,

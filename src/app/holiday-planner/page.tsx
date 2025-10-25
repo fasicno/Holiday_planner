@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -19,6 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 
 type ActivityType = SuggestActivitiesInput['activityType'];
@@ -33,7 +34,9 @@ export default function HolidayPlannerPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
+  const handleAddToItinerary = (e: React.MouseEvent, suggestion: ActivitySuggestion) => {
+    e.preventDefault();
+    e.stopPropagation();
     setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
   };
 
@@ -82,6 +85,28 @@ export default function HolidayPlannerPage() {
     }
   };
 
+  const SuggestionCard = ({ item }: { item: ActivitySuggestion }) => (
+    <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg">
+      <CardHeader>
+        <CardTitle>{item.name}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-grow space-y-2">
+        <p className="text-muted-foreground">{item.description}</p>
+        <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
+      </CardContent>
+      <div className="p-6 pt-0 mt-auto">
+          <Button 
+            className="w-full"
+            onClick={(e) => handleAddToItinerary(e, item)}
+            disabled={isSuggestionInItinerary(item)}
+          >
+            <Plus className="mr-2"/>
+            Add to Itinerary
+          </Button>
+      </div>
+    </Card>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
       <div className="space-y-4 text-center mb-12">
@@ -121,6 +146,7 @@ export default function HolidayPlannerPage() {
                   <SelectItem value="hidden gems">Hidden Gems</SelectItem>
                   <SelectItem value="shopping">Shopping</SelectItem>
                   <SelectItem value="movies">Movies</SelectItem>
+                  <SelectItem value="hotels">Hotels</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -162,27 +188,22 @@ export default function HolidayPlannerPage() {
         <div>
           <h2 className="text-3xl font-headline font-bold text-center mb-8">Your AI-Powered Suggestions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {suggestions.map((item, index) => (
-              <Card key={index} className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>{item.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow space-y-2">
-                  <p className="text-muted-foreground">{item.description}</p>
-                  <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
-                </CardContent>
-                <div className="p-6 pt-0">
-                    <Button 
-                      className="w-full"
-                      onClick={() => handleAddToItinerary(item)}
-                      disabled={isSuggestionInItinerary(item)}
-                    >
-                      <Plus className="mr-2"/>
-                      Add to Itinerary
-                    </Button>
-                </div>
-              </Card>
-            ))}
+            {suggestions.map((item, index) =>
+              item.website ? (
+                <Link
+                  key={index}
+                  href={item.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  aria-label={`Visit website for ${item.name}`}
+                >
+                  <SuggestionCard item={item} />
+                </Link>
+              ) : (
+                <SuggestionCard key={index} item={item} />
+              )
+            )}
           </div>
         </div>
       )}
