@@ -45,9 +45,10 @@ export default function HolidayPlannerPage() {
   };
   
   const handleBookTaxi = (destination: ActivitySuggestion) => {
+    window.open(`https://www.olacabs.com/`, '_blank');
     toast({
-      title: "Taxi Booked!",
-      description: `Your taxi to ${destination.name} is on its way.`,
+      title: "Redirecting to Ola Cabs...",
+      description: `Continue your booking for ${destination.name} on the Ola website.`,
     })
   }
 
@@ -200,12 +201,12 @@ export default function HolidayPlannerPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will book a taxi to transport you to {item.name}.
+                              This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleBookTaxi(item)}>Confirm</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleBookTaxi(item)}>Continue</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
