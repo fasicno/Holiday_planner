@@ -9,7 +9,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import placeholderData from '@/lib/placeholder-images.json';
 
 const SuggestActivitiesInputSchema = z.object({
   location: z.string().describe('The city or area for the holiday.'),
@@ -22,8 +21,6 @@ const ActivitySuggestionSchema = z.object({
     description: z.string().describe('A short, compelling description of the activity.'),
     address: z.string().describe('The approximate address or area.'),
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
-    imageUrl: z.string().url().describe('A URL for a relevant, high-quality image for the suggestion.'),
-    imageHint: z.string().describe('One or two keywords for a relevant image. For tourist attractions that are temples, use the hint "temple".'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -32,29 +29,7 @@ const SuggestActivitiesOutputSchema = z.object({
 export type SuggestActivitiesOutput = z.infer<typeof SuggestActivitiesOutputSchema>;
 
 export async function suggestActivities(input: SuggestActivitiesInput): Promise<SuggestActivitiesOutput> {
-  const result = await suggestActivitiesFlow(input);
-  
-  // Replace AI-generated image URLs with reliable placeholders
-  const activityPlaceholders = placeholderData.placeholderImages.filter(p => p.id.startsWith('activity-'));
-  
-  result.suggestions.forEach((suggestion, index) => {
-    // Try to find a relevant placeholder based on the hint
-    const hintWords = (suggestion.imageHint?.toLowerCase() || '').split(' ');
-    let placeholder = activityPlaceholders.find(p => {
-      const placeholderHintWords = p.imageHint.toLowerCase().split(' ');
-      return hintWords.some(hw => placeholderHintWords.includes(hw));
-    });
-    
-    // Fallback to cycling through placeholders if no specific match is found
-    if (!placeholder) {
-      placeholder = activityPlaceholders[index % activityPlaceholders.length];
-    }
-
-    suggestion.imageUrl = placeholder.imageUrl;
-    suggestion.imageHint = placeholder.imageHint;
-  });
-
-  return result;
+  return await suggestActivitiesFlow(input);
 }
 
 const prompt = ai.definePrompt({
@@ -66,8 +41,6 @@ const prompt = ai.definePrompt({
 Based on the user's location and desired activity type, provide a list of 3-5 specific and interesting suggestions.
 
 For each suggestion, provide a name, a short description, an address, and a website URL if one is available.
-Crucially, DO NOT provide an imageUrl. Provide an imageHint of one or two keywords that would be good for a photo of the location.
-For any suggestions that are temples, you MUST use the imageHint "temple".
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,

@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ClientOnly } from '@/components/client-only';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
@@ -37,17 +36,6 @@ const SuggestionCard = ({
   isAdded: boolean 
 }) => (
     <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg overflow-hidden">
-      {item.imageUrl && (
-        <div className="relative h-48 w-full">
-          <Image
-            src={item.imageUrl}
-            alt={`Image of ${item.name}`}
-            fill
-            className="object-cover"
-            data-ai-hint={item.imageHint}
-          />
-        </div>
-      )}
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
       </CardHeader>
@@ -201,7 +189,6 @@ export default function HolidayPlannerPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
                <Card key={i}>
-                  <div className="h-48 bg-muted w-full animate-pulse"></div>
                   <CardHeader>
                       <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
                   </CardHeader>
