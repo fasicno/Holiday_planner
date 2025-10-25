@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Taxi } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -192,7 +192,7 @@ export default function HolidayPlannerPage() {
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="outline" size="sm">
-                            <Taxi className="mr-2" />
+                            <Car className="mr-2" />
                             Book Taxi
                           </Button>
                         </AlertDialogTrigger>
