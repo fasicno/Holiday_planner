@@ -32,40 +32,34 @@ type Coordinates = {
   longitude: number;
 };
 
-const SuggestionCardImage = ({ suggestion, location }: { suggestion: ActivitySuggestion, location: string }) => {
-    const { imagePrompt, name, description } = suggestion;
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [isImageLoading, setIsImageLoading] = useState(true);
-  
-    useEffect(() => {
-        setIsImageLoading(true);
-        // Using a consistent seed for picsum.photos based on the suggestion name
-        // This ensures the same image is shown for the same suggestion, but is unique otherwise.
-        const seed = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        setImageUrl(`https://picsum.photos/seed/${seed}/600/400`);
-        setIsImageLoading(false);
-    }, [name]);
-  
+const SuggestionCardImage = ({ suggestion }: { suggestion: ActivitySuggestion }) => {
+  const { photoReference, name } = suggestion;
+
+  if (!photoReference) {
     return (
       <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
-        {isImageLoading && (
-          <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
-            <ImageIcon className="w-8 h-8" />
-            <span className="text-xs">Loading image...</span>
-          </div>
-        )}
-        {imageUrl && !isImageLoading && (
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            data-ai-hint={imagePrompt}
-          />
-        )}
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+          <ImageIcon className="w-8 h-8" />
+          <span className="text-xs">No image available</span>
+        </div>
       </div>
     );
-  };
+  }
+
+  const imageUrl = `/api/photo?photo_reference=${photoReference}`;
+
+  return (
+    <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
+      <Image
+        src={imageUrl}
+        alt={name}
+        fill
+        className="object-cover transition-transform duration-300 group-hover:scale-105"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+    </div>
+  );
+};
 
 
 const SuggestionCard = ({
@@ -82,7 +76,7 @@ const SuggestionCard = ({
   location: string,
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <SuggestionCardImage suggestion={item} location={location} />
+      <SuggestionCardImage suggestion={item} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -332,8 +326,17 @@ export default function HolidayPlannerPage() {
                 {itinerary.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
                     <div className="flex items-center gap-4">
-                       <div className="w-16 h-16 rounded-md bg-muted flex-shrink-0">
-                         <ImageIcon className="w-full h-full object-cover text-muted-foreground p-4"/>
+                       <div className="w-16 h-16 rounded-md bg-muted flex-shrink-0 relative overflow-hidden">
+                          {item.photoReference ? (
+                            <Image 
+                              src={`/api/photo?photo_reference=${item.photoReference}`}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <ImageIcon className="w-full h-full object-cover text-muted-foreground p-4"/>
+                          )}
                        </div>
                       <div className="flex-grow">
                         <h3 className="font-bold">{item.name}</h3>
