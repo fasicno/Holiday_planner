@@ -28,6 +28,46 @@ type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
 type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
 
+const SuggestionCard = ({ 
+  item, 
+  onAddToItinerary,
+  isAdded
+}: { 
+  item: ActivitySuggestion, 
+  onAddToItinerary: (e: React.MouseEvent, suggestion: ActivitySuggestion) => void,
+  isAdded: boolean 
+}) => (
+    <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg overflow-hidden">
+      {item.imageUrl && (
+        <div className="relative h-48 w-full">
+          <Image
+            src={item.imageUrl}
+            alt={`Image of ${item.name}`}
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
+      <CardHeader>
+        <CardTitle>{item.name}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-grow space-y-2">
+        <p className="text-muted-foreground">{item.description}</p>
+        <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
+      </CardContent>
+      <div className="p-6 pt-0 mt-auto">
+        <Button
+          className="w-full"
+          onClick={(e) => onAddToItinerary(e, item)}
+          disabled={isAdded}
+        >
+          <Plus className="mr-2" />
+          Add to Itinerary
+        </Button>
+      </div>
+    </Card>
+);
+
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState<ActivityType>('tourist attractions');
@@ -94,38 +134,6 @@ export default function HolidayPlannerPage() {
       setIsLoading(false);
     }
   };
-
-  const SuggestionCard = ({ item }: { item: ActivitySuggestion }) => (
-    <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg overflow-hidden">
-      {item.imageUrl && (
-        <div className="relative h-48 w-full">
-          <Image
-            src={item.imageUrl}
-            alt={`Image of ${item.name}`}
-            fill
-            className="object-cover"
-          />
-        </div>
-      )}
-      <CardHeader>
-        <CardTitle>{item.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-2">
-        <p className="text-muted-foreground">{item.description}</p>
-        <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
-      </CardContent>
-      <div className="p-6 pt-0 mt-auto">
-        <Button
-          className="w-full"
-          onClick={(e) => handleAddToItinerary(e, item)}
-          disabled={isSuggestionInItinerary(item)}
-        >
-          <Plus className="mr-2" />
-          Add to Itinerary
-        </Button>
-      </div>
-    </Card>
-  );
 
   return (
     <ClientOnly>
@@ -220,11 +228,19 @@ export default function HolidayPlannerPage() {
                     className="block"
                     aria-label={`Visit website for ${item.name}`}
                   >
-                    <SuggestionCard item={item} />
+                    <SuggestionCard 
+                      item={item} 
+                      onAddToItinerary={handleAddToItinerary}
+                      isAdded={isSuggestionInItinerary(item)}
+                    />
                   </Link>
                 ) : (
                   <div key={index}>
-                    <SuggestionCard item={item} />
+                    <SuggestionCard 
+                      item={item} 
+                      onAddToItinerary={handleAddToItinerary}
+                      isAdded={isSuggestionInItinerary(item)}
+                    />
                   </div>
                 )
               )}
@@ -333,3 +349,5 @@ export default function HolidayPlannerPage() {
     </ClientOnly>
   );
 }
+
+    
