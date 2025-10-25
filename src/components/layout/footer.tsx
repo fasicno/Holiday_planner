@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { CalendarCheck, Twitter, Instagram, Facebook, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ClientOnly } from '../client-only';
 
 export function Footer() {
   return (
@@ -54,7 +55,9 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Holiday Planner. All rights reserved.
+            <ClientOnly>
+              <>© {new Date().getFullYear()} Holiday Planner. All rights reserved.</>
+            </ClientOnly>
           </p>
           <div className="flex items-center gap-4">
             <Link href="#" aria-label="Twitter">
