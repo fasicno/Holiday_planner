@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, Image as ImageIcon } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
+import { generateImage } from '@/ai/flows/generate-image-flow';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,13 +22,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { ClientOnly } from '@/components/client-only';
-import placeholderData from '@/lib/placeholder-images.json';
-import { cn } from '@/lib/utils';
-
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
-type SuggestionWithImage = ActivitySuggestion & { imageUrl: string; imageHint: string };
+type SuggestionWithImage = ActivitySuggestion & { imageUrl?: string };
 type ItineraryItem = SuggestionWithImage & { activityType: ActivityType };
 
 
@@ -36,22 +34,54 @@ type Coordinates = {
   longitude: number;
 };
 
-const getBestPlaceholder = (hint: string) => {
-    const hintWords = hint.toLowerCase().split(/\s+/);
-    let bestMatch = placeholderData.placeholderImages[0]; // Default fallback
-    let maxMatch = 0;
 
-    for (const placeholder of placeholderData.placeholderImages) {
-        const placeholderHintWords = placeholder.imageHint.toLowerCase().split(/\s+/);
-        const currentMatches = hintWords.filter(word => placeholderHintWords.includes(word)).length;
+const SuggestionCardImage = ({ prompt, name }: { prompt: string; name: string }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-        if (currentMatches > maxMatch) {
-            maxMatch = currentMatches;
-            bestMatch = placeholder;
-        }
+  const fetchImage = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await generateImage({ prompt });
+      setImageUrl(result.imageUrl);
+    } catch (error) {
+      console.error(`Failed to generate image for "${name}":`, error);
+      // You could set a fallback image URL here if you have one
+    } finally {
+      setIsLoading(false);
     }
-    return bestMatch;
-}
+  }, [prompt, name]);
+
+  useEffect(() => {
+    fetchImage();
+  }, [fetchImage]);
+
+  return (
+    <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
+      {isLoading && (
+        <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
+            <ImageIcon className="w-8 h-8" />
+            <span className="text-xs">Generating image...</span>
+        </div>
+      )}
+      {imageUrl && !isLoading && (
+        <Image
+          src={imageUrl}
+          alt={name}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      )}
+       {!imageUrl && !isLoading && (
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <ImageIcon className="w-8 h-8" />
+            <span className="text-xs">Image not available</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 const SuggestionCard = ({
   item,
@@ -65,15 +95,7 @@ const SuggestionCard = ({
   distance: number | null
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <div className="relative h-48 w-full overflow-hidden">
-        <Image
-          src={item.imageUrl}
-          alt={item.description}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          data-ai-hint={item.imageHint}
-        />
-      </div>
+      <SuggestionCardImage prompt={item.imagePrompt} name={item.name} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -145,7 +167,10 @@ export default function HolidayPlannerPage() {
   }, [toast]);
 
   const handleAddToItinerary = (suggestion: SuggestionWithImage) => {
-    setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
+    // Note: When adding to itinerary, we don't need to preserve the dynamically generated imageUrl
+    // as the itinerary card will generate its own if needed.
+    const { imageUrl, ...suggestionWithoutImage } = suggestion;
+    setItinerary((prev) => [...prev, { ...suggestionWithoutImage, activityType }]);
   };
 
   const handleRemoveFromItinerary = (suggestionToRemove: SuggestionWithImage) => {
@@ -188,15 +213,7 @@ export default function HolidayPlannerPage() {
     setSuggestions([]);
     try {
       const result = await suggestActivities({ location, activityType });
-      const suggestionsWithImages = result.suggestions.map((suggestion) => {
-        const placeholder = getBestPlaceholder(suggestion.imageHint);
-        return {
-            ...suggestion,
-            imageUrl: placeholder.imageUrl,
-            imageHint: placeholder.imageHint, // Use the matched hint for data attribute
-        };
-      });
-      setSuggestions(suggestionsWithImages);
+      setSuggestions(result.suggestions);
     } catch (error) {
       console.error("Failed to get suggestions:", error);
       toast({
@@ -297,7 +314,7 @@ export default function HolidayPlannerPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {suggestions.map((item, index) => (
                 <SuggestionCard 
-                  key={index}
+                  key={`${item.name}-${index}`}
                   item={item} 
                   onAddToItinerary={handleAddToItinerary}
                   isAdded={isSuggestionInItinerary(item)}
@@ -316,14 +333,10 @@ export default function HolidayPlannerPage() {
                 {itinerary.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
                     <div className="flex items-center gap-4">
-                       <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          width={64}
-                          height={64}
-                          className="rounded-md object-cover h-16 w-16"
-                          data-ai-hint={item.imageHint}
-                        />
+                       <div className="w-16 h-16 rounded-md bg-muted flex-shrink-0">
+                         {/* Itinerary items could also generate images, or show a static icon */}
+                         <ImageIcon className="w-full h-full object-cover text-muted-foreground p-4"/>
+                       </div>
                       <div className="flex-grow">
                         <h3 className="font-bold">{item.name}</h3>
                         <p className="text-sm text-muted-foreground">{item.address}</p>

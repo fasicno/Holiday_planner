@@ -23,7 +23,7 @@ const ActivitySuggestionSchema = z.object({
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
     latitude: z.number().describe('The latitude of the location.'),
     longitude: z.number().describe('The longitude of the location.'),
-    imageHint: z.string().describe('A one or two word hint for a relevant stock photo for this location, e.g., "beach sunset" or "modern museum".'),
+    imagePrompt: z.string().describe('A detailed, specific text-to-image prompt to generate a photorealistic image for this location. For example, "A vibrant outdoor food market in Bangkok, Thailand" or "The Eiffel Tower in Paris at sunset".'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -43,7 +43,7 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short, compelling description, an address, a website URL if one is available, the precise latitude and longitude, and a one or two word hint for a relevant stock photo for this location, e.g., "beach sunset" or "modern museum".
+For each suggestion, provide a name, a short, compelling description, an address, a website URL if one is available, the precise latitude and longitude, and a detailed text-to-image prompt to generate a photorealistic image for the location.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,
