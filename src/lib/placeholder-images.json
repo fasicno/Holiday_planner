@@ -3,8 +3,38 @@
     {
       "id": "hero-background",
       "description": "A beautiful infinity pool overlooking a tropical ocean at sunset.",
-      "imageUrl": "https://images.unsplash.com/photo-1687834618283-1b9e12de54a7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxyZXNvcnQlMjBwb29sfGVufDB8fHx8MTc2MTI0MjUyNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1527142879-95b61a0b8226?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxyZXNvcnQlMjBwb29sfGVufDB8fHx8MTc2MTM1ODM5OHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "resort pool"
+    },
+    {
+      "id": "activity-1",
+      "description": "A bustling city street at night with neon lights.",
+      "imageUrl": "https://images.unsplash.com/photo-1505811210036-052144988918?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjaXR5JTIwbmlnaHR8ZW58MHx8fHwxNzYxMzczMDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city night"
+    },
+    {
+      "id": "activity-2",
+      "description": "A delicious-looking meal on a restaurant table.",
+      "imageUrl": "https://images.unsplash.com/photo-1513772457252-c0417654a2a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NjEzODU1MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gourmet food"
+    },
+    {
+      "id": "activity-3",
+      "description": "A serene mountain landscape with a clear lake.",
+      "imageUrl": "https://images.unsplash.com/photo-1499915174960-6f5340157928?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bW91bnRhaW4lMjBsYWtlfGVufDB8fHx8MTc2MTMyMTM5NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mountain lake"
+    },
+    {
+      "id": "activity-4",
+      "description": "Modern architecture of a shopping mall interior.",
+      "imageUrl": "https://images.unsplash.com/photo-1567449303078-57ad995bd17a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzaG9wcGluZyUyMG1hbGx8ZW58MHx8fHwxNzYxMzgzNDk5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "shopping mall"
+    },
+    {
+      "id": "activity-5",
+      "description": "A comfortable and stylish hotel room.",
+      "imageUrl": "https://images.unsplash.com/photo-1568495248636-6432b97bd949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzYxMzc3MDUxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hotel room"
     }
   ]
 }

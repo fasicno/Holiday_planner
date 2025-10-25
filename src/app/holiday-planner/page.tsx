@@ -23,7 +23,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ClientOnly } from '@/components/client-only';
 
-
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
 type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
@@ -45,6 +44,7 @@ const SuggestionCard = ({
             alt={`Image of ${item.name}`}
             fill
             className="object-cover"
+            data-ai-hint={item.imageHint}
           />
         </div>
       )}
@@ -67,6 +67,7 @@ const SuggestionCard = ({
       </div>
     </Card>
 );
+
 
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
@@ -349,5 +350,3 @@ export default function HolidayPlannerPage() {
     </ClientOnly>
   );
 }
-
-    

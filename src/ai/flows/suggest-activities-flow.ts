@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import placeholderData from '@/lib/placeholder-images.json';
 
 const SuggestActivitiesInputSchema = z.object({
   location: z.string().describe('The city or area for the holiday.'),
@@ -22,6 +23,7 @@ const ActivitySuggestionSchema = z.object({
     address: z.string().describe('The approximate address or area.'),
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
     imageUrl: z.string().url().describe('A URL for a relevant, high-quality image for the suggestion.'),
+    imageHint: z.string().describe('One or two keywords for a relevant image.'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -30,7 +32,18 @@ const SuggestActivitiesOutputSchema = z.object({
 export type SuggestActivitiesOutput = z.infer<typeof SuggestActivitiesOutputSchema>;
 
 export async function suggestActivities(input: SuggestActivitiesInput): Promise<SuggestActivitiesOutput> {
-  return suggestActivitiesFlow(input);
+  const result = await suggestActivitiesFlow(input);
+  
+  // Replace AI-generated image URLs with reliable placeholders
+  const activityPlaceholders = placeholderData.placeholderImages.filter(p => p.id.startsWith('activity-'));
+  
+  result.suggestions.forEach((suggestion, index) => {
+    const placeholder = activityPlaceholders[index % activityPlaceholders.length];
+    suggestion.imageUrl = placeholder.imageUrl;
+    suggestion.imageHint = placeholder.imageHint;
+  });
+
+  return result;
 }
 
 const prompt = ai.definePrompt({
@@ -41,7 +54,8 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 3-5 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short description, an address, a website URL if one is available, and a valid, publicly accessible URL for a relevant, high-quality image.
+For each suggestion, provide a name, a short description, an address, and a website URL if one is available.
+Crucially, DO NOT provide an imageUrl. Provide an imageHint of one or two keywords that would be good for a photo of the location.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,
