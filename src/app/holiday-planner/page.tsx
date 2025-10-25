@@ -102,8 +102,8 @@ export default function HolidayPlannerPage() {
           <Image
             src={item.imageUrl}
             alt={`Image of ${item.name}`}
-            layout="fill"
-            objectFit="cover"
+            fill
+            className="object-cover"
           />
         </div>
       )}
