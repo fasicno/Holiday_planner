@@ -19,7 +19,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
 import { ClientOnly } from '@/components/client-only';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
@@ -32,7 +31,7 @@ const SuggestionCard = ({
   isAdded
 }: { 
   item: ActivitySuggestion, 
-  onAddToItinerary: (e: React.MouseEvent, suggestion: ActivitySuggestion) => void,
+  onAddToItinerary: (suggestion: ActivitySuggestion) => void,
   isAdded: boolean 
 }) => (
     <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg overflow-hidden">
@@ -46,7 +45,7 @@ const SuggestionCard = ({
       <div className="p-6 pt-0 mt-auto">
         <Button
           className="w-full"
-          onClick={(e) => onAddToItinerary(e, item)}
+          onClick={() => onAddToItinerary(item)}
           disabled={isAdded}
         >
           <Plus className="mr-2" />
@@ -65,9 +64,7 @@ export default function HolidayPlannerPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleAddToItinerary = (e: React.MouseEvent, suggestion: ActivitySuggestion) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
   };
 
@@ -206,32 +203,14 @@ export default function HolidayPlannerPage() {
           <div>
             <h2 className="text-3xl font-headline font-bold text-center mb-8">Your AI-Powered Suggestions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {suggestions.map((item, index) =>
-                item.website ? (
-                  <Link
-                    key={index}
-                    href={item.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                    aria-label={`Visit website for ${item.name}`}
-                  >
-                    <SuggestionCard 
-                      item={item} 
-                      onAddToItinerary={handleAddToItinerary}
-                      isAdded={isSuggestionInItinerary(item)}
-                    />
-                  </Link>
-                ) : (
-                  <div key={index}>
-                    <SuggestionCard 
-                      item={item} 
-                      onAddToItinerary={handleAddToItinerary}
-                      isAdded={isSuggestionInItinerary(item)}
-                    />
-                  </div>
-                )
-              )}
+              {suggestions.map((item, index) => (
+                <SuggestionCard 
+                  key={index}
+                  item={item} 
+                  onAddToItinerary={handleAddToItinerary}
+                  isAdded={isSuggestionInItinerary(item)}
+                />
+              ))}
             </div>
           </div>
         )}
