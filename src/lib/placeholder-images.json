@@ -25,40 +25,70 @@
       "imageHint": "colosseum rome"
     },
     {
-      "id": "activity-1",
-      "description": "A bustling city street at night with neon lights.",
-      "imageUrl": "https://images.unsplash.com/photo-1505811210036-052144988918?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjaXR5JTIwbmlnaHR8ZW58MHx8fHwxNzYxMzczMDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "city night"
+      "id": "statue-of-liberty",
+      "description": "The Statue of Liberty in New York City, a symbol of freedom.",
+      "imageUrl": "https://images.unsplash.com/photo-1546272989-4b95d3a2b72d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "statue liberty"
     },
     {
-      "id": "activity-2",
+      "id": "taj-mahal",
+      "description": "The Taj Mahal in Agra, India, an ivory-white marble mausoleum.",
+      "imageUrl": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "taj mahal"
+    },
+    {
+      "id": "sydney-opera-house",
+      "description": "The Sydney Opera House in Australia, a multi-venue performing arts centre.",
+      "imageUrl": "https://images.unsplash.com/photo-15230596230-c09563d43233?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "sydney opera"
+    },
+    {
+      "id": "pyramids-giza",
+      "description": "The Great Pyramids of Giza in Egypt.",
+      "imageUrl": "https://images.unsplash.com/photo-1572439123294-072d7f003318?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "pyramids giza"
+    },
+    {
+      "id": "activity-restaurant",
       "description": "A delicious-looking meal on a restaurant table.",
       "imageUrl": "https://images.unsplash.com/photo-1513772457252-c0417654a2a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NjEzODU1MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "gourmet food"
+      "imageHint": "gourmet food restaurant"
     },
     {
-      "id": "activity-3",
-      "description": "A serene mountain landscape with a clear lake.",
-      "imageUrl": "https://images.unsplash.com/photo-1499915174960-6f5340157928?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bW91bnRhaW4lMjBsYWtlfGVufDB8fHx8MTc2MTMyMTM5NXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mountain lake"
-    },
-    {
-      "id": "activity-4",
+      "id": "activity-shopping",
       "description": "Modern architecture of a shopping mall interior.",
       "imageUrl": "https://images.unsplash.com/photo-1567449303078-57ad995bd17a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzaG9wcGluZyUyMG1hbGx8ZW58MHx8fHwxNzYxMzgzNDk5fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "shopping mall"
     },
     {
-      "id": "activity-5",
+      "id": "activity-hotel",
       "description": "A comfortable and stylish hotel room.",
-      "imageUrl": "https://images.unsplash.com/photo-1568495248636-6432b97bd949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzYxMzc3MDUxfDA&ixlibrb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1568495248636-6432b97bd949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzYxMzc3MDUxfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "hotel room"
     },
     {
-      "id": "activity-6",
-      "description": "An ancient, ornate temple structure.",
-      "imageUrl": "https://images.unsplash.com/photo-1583852885798-1e4346b7a2e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0ZW1wbGV8ZW58MHx8fHwxNzYxNDYxNzMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "temple"
+      "id": "activity-beach",
+      "description": "A beautiful tropical beach with turquoise water.",
+      "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723a996f329?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "beach resort"
+    },
+    {
+      "id": "activity-museum",
+      "description": "The interior of a modern art museum.",
+      "imageUrl": "https://images.unsplash.com/photo-1507808973436-a4ed7b5e87c9?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "museum gallery"
+    },
+    {
+      "id": "activity-concert",
+      "description": "A lively concert with a large crowd and stage lights.",
+      "imageUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "concert music"
+    },
+    {
+      "id": "activity-hiking",
+      "description": "A hiker on a trail in a lush green forest.",
+      "imageUrl": "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "hiking trail"
     }
   ]
 }
