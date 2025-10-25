@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -25,35 +25,62 @@ type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
 type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
 
+type Coordinates = {
+  latitude: number;
+  longitude: number;
+};
+
+
 const SuggestionCard = ({ 
   item, 
   onAddToItinerary,
-  isAdded
+  isAdded,
+  distance
 }: { 
   item: ActivitySuggestion, 
   onAddToItinerary: (suggestion: ActivitySuggestion) => void,
-  isAdded: boolean 
+  isAdded: boolean,
+  distance: number | null
 }) => (
-    <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg overflow-hidden">
+    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
+        <CardDescription>{item.address}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-2">
         <p className="text-muted-foreground">{item.description}</p>
-        <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
+        {distance !== null && (
+          <div className="flex items-center text-sm text-primary pt-2 font-medium">
+            <MapPin className="mr-2 h-4 w-4" />
+            <span>{distance.toFixed(2)} km away</span>
+          </div>
+        )}
       </CardContent>
-      <div className="p-6 pt-0 mt-auto">
+      <CardFooter>
         <Button
           className="w-full"
           onClick={() => onAddToItinerary(item)}
           disabled={isAdded}
         >
           <Plus className="mr-2" />
-          Add to Itinerary
+          {isAdded ? 'Added to Itinerary' : 'Add to Itinerary'}
         </Button>
-      </div>
+      </CardFooter>
     </Card>
 );
+
+// Haversine formula to calculate distance between two lat/lng points
+const getDistance = (coord1: Coordinates, coord2: Coordinates) => {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (coord2.latitude - coord1.latitude) * Math.PI / 180;
+  const dLon = (coord2.longitude - coord1.longitude) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(coord1.latitude * Math.PI / 180) * Math.cos(coord2.latitude * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
 
 
 export default function HolidayPlannerPage() {
@@ -62,7 +89,29 @@ export default function HolidayPlannerPage() {
   const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserCoords({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.warn("Geolocation permission denied. Distance calculations will be unavailable.", error);
+          toast({
+            variant: "destructive",
+            title: "Location Access Denied",
+            description: "Could not get your location. Distances to suggestions will not be shown.",
+          });
+        }
+      );
+    }
+  }, [toast]);
 
   const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
@@ -194,6 +243,9 @@ export default function HolidayPlannerPage() {
                       <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
                       <div className="h-4 bg-muted rounded w-1/2 animate-pulse mt-2"></div>
                   </CardContent>
+                  <CardFooter>
+                      <div className="h-10 bg-muted rounded w-full animate-pulse"></div>
+                  </CardFooter>
                </Card>
             ))}
           </div>
@@ -209,6 +261,7 @@ export default function HolidayPlannerPage() {
                   item={item} 
                   onAddToItinerary={handleAddToItinerary}
                   isAdded={isSuggestionInItinerary(item)}
+                  distance={userCoords ? getDistance(userCoords, item) : null}
                 />
               ))}
             </div>

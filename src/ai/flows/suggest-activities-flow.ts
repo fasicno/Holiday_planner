@@ -21,6 +21,8 @@ const ActivitySuggestionSchema = z.object({
     description: z.string().describe('A short, compelling description of the activity.'),
     address: z.string().describe('The approximate address or area.'),
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
+    latitude: z.number().describe('The latitude of the location.'),
+    longitude: z.number().describe('The longitude of the location.'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -40,7 +42,7 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short, compelling description, an address, and a website URL if one is available.
+For each suggestion, provide a name, a short, compelling description, an address, a website URL if one is available, and the precise latitude and longitude.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,
