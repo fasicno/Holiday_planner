@@ -21,6 +21,7 @@ const ActivitySuggestionSchema = z.object({
     description: z.string().describe('A short, compelling description of the activity.'),
     address: z.string().describe('The approximate address or area.'),
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
+    imageUrl: z.string().url().describe('A URL for a relevant, high-quality image for the suggestion.'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -40,7 +41,7 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 3-5 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short description, an address, and a website URL if one is available.
+For each suggestion, provide a name, a short description, an address, a website URL if one is available, and a URL for a relevant, high-quality image.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,
@@ -57,5 +58,3 @@ const suggestActivitiesFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
