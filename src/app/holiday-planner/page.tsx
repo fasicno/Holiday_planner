@@ -71,6 +71,7 @@ export default function HolidayPlannerPage() {
                   <SelectItem value="tourist attractions">Tourist Attractions</SelectItem>
                   <SelectItem value="hidden gems">Hidden Gems</SelectItem>
                   <SelectItem value="shopping">Shopping</SelectItem>
+                  <SelectItem value="movies">Movies</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -12,7 +12,7 @@ import {z} from 'genkit';
 
 const SuggestActivitiesInputSchema = z.object({
   location: z.string().describe('The city or area for the holiday.'),
-  activityType: z.enum(['restaurants', 'tourist attractions', 'hidden gems', 'shopping']).describe('The type of activity to suggest.'),
+  activityType: z.enum(['restaurants', 'tourist attractions', 'hidden gems', 'shopping', 'movies']).describe('The type of activity to suggest.'),
 });
 export type SuggestActivitiesInput = z.infer<typeof SuggestActivitiesInputSchema>;
 
