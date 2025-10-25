@@ -35,22 +35,27 @@ type Coordinates = {
 };
 
 
-const SuggestionCardImage = ({ prompt, name }: { prompt: string; name: string }) => {
+const SuggestionCardImage = ({ suggestion, location }: { suggestion: SuggestionWithImage; location: string; }) => {
+  const { imagePrompt, name, description } = suggestion;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchImage = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await generateImage({ prompt });
+      const result = await generateImage({ 
+        prompt: imagePrompt,
+        location,
+        name,
+        description
+      });
       setImageUrl(result.imageUrl);
     } catch (error) {
       console.error(`Failed to generate image for "${name}":`, error);
-      // You could set a fallback image URL here if you have one
     } finally {
       setIsLoading(false);
     }
-  }, [prompt, name]);
+  }, [imagePrompt, location, name, description]);
 
   useEffect(() => {
     fetchImage();
@@ -85,17 +90,19 @@ const SuggestionCardImage = ({ prompt, name }: { prompt: string; name: string })
 
 const SuggestionCard = ({
   item,
+  location,
   onAddToItinerary,
   isAdded,
   distance
 }: {
   item: SuggestionWithImage,
+  location: string,
   onAddToItinerary: (suggestion: SuggestionWithImage) => void,
   isAdded: boolean,
   distance: number | null
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <SuggestionCardImage prompt={item.imagePrompt} name={item.name} />
+      <SuggestionCardImage suggestion={item} location={location} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -316,6 +323,7 @@ export default function HolidayPlannerPage() {
                 <SuggestionCard 
                   key={`${item.name}-${index}`}
                   item={item} 
+                  location={location}
                   onAddToItinerary={handleAddToItinerary}
                   isAdded={isSuggestionInItinerary(item)}
                   distance={userCoords ? getDistance(userCoords, item) : null}
