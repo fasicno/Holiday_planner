@@ -23,7 +23,7 @@ const ActivitySuggestionSchema = z.object({
     address: z.string().describe('The approximate address or area.'),
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
     imageUrl: z.string().url().describe('A URL for a relevant, high-quality image for the suggestion.'),
-    imageHint: z.string().describe('One or two keywords for a relevant image.'),
+    imageHint: z.string().describe('One or two keywords for a relevant image. For tourist attractions that are temples, use the hint "temple".'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -64,6 +64,7 @@ Based on the user's location and desired activity type, provide a list of 3-5 sp
 
 For each suggestion, provide a name, a short description, an address, and a website URL if one is available.
 Crucially, DO NOT provide an imageUrl. Provide an imageHint of one or two keywords that would be good for a photo of the location.
+For any suggestions that are temples, you MUST use the imageHint "temple".
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,

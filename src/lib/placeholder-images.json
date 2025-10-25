@@ -33,8 +33,14 @@
     {
       "id": "activity-5",
       "description": "A comfortable and stylish hotel room.",
-      "imageUrl": "https://images.unsplash.com/photo-1568495248636-6432b97bd949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzYxMzc3MDUxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1568495248636-6432b97bd949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzYxMzc3MDUxfDA&ixlibrb-4.1.0&q=80&w=1080",
       "imageHint": "hotel room"
+    },
+    {
+      "id": "activity-6",
+      "description": "An ancient, ornate temple structure.",
+      "imageUrl": "https://images.unsplash.com/photo-1583852885798-1e4346b7a2e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0ZW1wbGV8ZW58MHx8fHwxNzYxNDYxNzMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "temple"
     }
   ]
 }
