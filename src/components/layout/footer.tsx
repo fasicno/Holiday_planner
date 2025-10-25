@@ -43,13 +43,15 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">Stay Updated</h4>
             <p className="text-muted-foreground text-sm">Subscribe to our newsletter for travel tips and updates.</p>
-            <form className="flex space-x-2">
-              <Input type="email" placeholder="Your email address" className="flex-1 bg-background" />
-              <Button type="submit" size="icon" className="bg-accent hover:bg-accent/90">
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Subscribe</span>
-              </Button>
-            </form>
+            <ClientOnly>
+              <form className="flex space-x-2">
+                <Input type="email" placeholder="Your email address" className="flex-1 bg-background" />
+                <Button type="submit" size="icon" className="bg-accent hover:bg-accent/90">
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">Subscribe</span>
+                </Button>
+              </form>
+            </ClientOnly>
           </div>
         </div>
 
