@@ -3,15 +3,13 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import placeholderData from '@/lib/placeholder-images.json';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Car, Clapperboard, Map, Utensils, Star } from 'lucide-react';
+import { ArrowRight, Car, Clapperboard, Map, Utensils } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { generateImage } from '@/ai/flows/generate-image-flow';
-import { ClientOnly } from '@/components/client-only';
-import { Suspense } from 'react';
 
 const heroImage = placeholderData.placeholderImages.find(p => p.id === 'hero-background');
 const vidhanaSoudhaImage = placeholderData.placeholderImages.find(p => p.id === 'vidhana-soudha');
-
+const eiffelTowerImage = placeholderData.placeholderImages.find(p => p.id === 'eiffel-tower');
+const colosseumImage = placeholderData.placeholderImages.find(p => p.id === 'colosseum');
 
 const planningActivities = [
   {
@@ -49,42 +47,38 @@ const planningActivities = [
 ];
 
 const featuredDestinations = [
-    {
-        name: "Vidhana Soudha",
-        location: "Bangalore, India",
-        description: "The seat of the state legislature of Karnataka, a magnificent example of Neo-Dravidian architecture.",
-        imagePrompt: "A grand, imposing government building, Vidhana Soudha, in Bangalore, India, under a clear blue sky. Show the intricate details of its Dravidian architectural style."
-    },
-    {
-        name: "Eiffel Tower",
-        location: "Paris, France",
-        description: "An iconic wrought-iron lattice tower on the Champ de Mars.",
-        imagePrompt: "The Eiffel Tower in Paris at sunset, with golden light reflecting off the structure and the city skyline in the background."
-    },
-    {
-        name: "Colosseum",
-        location: "Rome, Italy",
-        description: "An ancient oval amphitheatre in the centre of the city of Rome.",
-        imagePrompt: "The ancient Colosseum in Rome, Italy, with dramatic lighting showcasing its historical architecture and arches."
-    }
-]
+  {
+    name: "Vidhana Soudha",
+    location: "Bangalore, India",
+    description: "The seat of the state legislature of Karnataka, a magnificent example of Neo-Dravidian architecture.",
+    image: vidhanaSoudhaImage,
+  },
+  {
+    name: "Eiffel Tower",
+    location: "Paris, France",
+    description: "An iconic wrought-iron lattice tower on the Champ de Mars.",
+    image: eiffelTowerImage,
+  },
+  {
+    name: "Colosseum",
+    location: "Rome, Italy",
+    description: "An ancient oval amphitheatre in the centre of the city of Rome.",
+    image: colosseumImage,
+  }
+];
 
-async function GeneratedImageCard({ destination }: { destination: typeof featuredDestinations[0] }) {
-  const { imageUrl } = await generateImage({
-    prompt: destination.imagePrompt,
-    name: destination.name,
-    location: destination.location,
-    description: destination.description,
-  });
+function DestinationCard({ destination }: { destination: typeof featuredDestinations[0] }) {
+  if (!destination.image) return null;
 
   return (
     <Card className="overflow-hidden group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
       <div className="relative h-64 w-full">
         <Image
-          src={imageUrl}
-          alt={destination.name}
+          src={destination.image.imageUrl}
+          alt={destination.image.description}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
+          data-ai-hint={destination.image.imageHint}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 p-6">
@@ -103,24 +97,6 @@ async function GeneratedImageCard({ destination }: { destination: typeof feature
     </Card>
   );
 }
-
-function ImageCardSkeleton() {
-    return (
-        <Card className="overflow-hidden">
-            <div className="relative h-64 w-full bg-muted animate-pulse flex items-center justify-center">
-                <p className="text-muted-foreground text-sm">Generating image...</p>
-            </div>
-            <CardContent className="p-6">
-                <div className="h-6 w-3/4 bg-muted rounded animate-pulse mb-2"></div>
-                <div className="h-4 w-1/2 bg-muted rounded animate-pulse"></div>
-                <div className="h-4 w-full bg-muted rounded animate-pulse mt-4"></div>
-                <div className="h-4 w-5/6 bg-muted rounded animate-pulse mt-2"></div>
-                <div className="h-6 w-24 bg-muted rounded animate-pulse mt-4"></div>
-            </CardContent>
-        </Card>
-    )
-}
-
 
 export default function Home() {
   return (
@@ -198,17 +174,12 @@ export default function Home() {
             <div className="space-y-4 text-center">
               <h2 className="text-3xl md:text-4xl font-headline font-bold">Featured Destinations</h2>
               <p className="max-w-2xl mx-auto text-lg text-muted-foreground">
-                Get inspired by these AI-generated images of iconic landmarks.
+                Get inspired by these images of iconic landmarks.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
                 {featuredDestinations.map(dest => (
-                    <ClientOnly key={dest.name}>
-                        <Suspense fallback={<ImageCardSkeleton />}>
-                            {/* @ts-ignore */}
-                            <GeneratedImageCard destination={dest} />
-                        </Suspense>
-                    </ClientOnly>
+                    <DestinationCard key={dest.name} destination={dest} />
                 ))}
             </div>
         </div>

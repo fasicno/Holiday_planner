@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, Image as ImageIcon } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
-import { generateImage } from '@/ai/flows/generate-image-flow';
+import placeholderData from '@/lib/placeholder-images.json';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,8 +25,7 @@ import { ClientOnly } from '@/components/client-only';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
-type SuggestionWithImage = ActivitySuggestion & { imageUrl?: string };
-type ItineraryItem = SuggestionWithImage & { activityType: ActivityType };
+type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
 
 
 type Coordinates = {
@@ -34,75 +33,69 @@ type Coordinates = {
   longitude: number;
 };
 
-
-const SuggestionCardImage = ({ suggestion, location }: { suggestion: SuggestionWithImage; location: string; }) => {
-  const { imagePrompt, name, description } = suggestion;
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchImage = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const result = await generateImage({ 
-        prompt: imagePrompt,
-        location,
-        name,
-        description
-      });
-      setImageUrl(result.imageUrl);
-    } catch (error) {
-      console.error(`Failed to generate image for "${name}":`, error);
-    } finally {
-      setIsLoading(false);
+const getBestPlaceholder = (imageHint: string) => {
+    if (!imageHint) return placeholderData.placeholderImages[0];
+  
+    const hintWords = imageHint.toLowerCase().split(' ');
+  
+    let bestMatch = placeholderData.placeholderImages[0];
+    let maxScore = 0;
+  
+    for (const placeholder of placeholderData.placeholderImages) {
+      const placeholderWords = placeholder.imageHint.toLowerCase().split(' ');
+      const score = hintWords.filter(word => placeholderWords.includes(word)).length;
+      if (score > maxScore) {
+        maxScore = score;
+        bestMatch = placeholder;
+      }
     }
-  }, [imagePrompt, location, name, description]);
+  
+    return bestMatch;
+  };
 
-  useEffect(() => {
-    fetchImage();
-  }, [fetchImage]);
-
-  return (
-    <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
-      {isLoading && (
-        <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
-            <ImageIcon className="w-8 h-8" />
-            <span className="text-xs">Generating image...</span>
-        </div>
-      )}
-      {imageUrl && !isLoading && (
-        <Image
-          src={imageUrl}
-          alt={name}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-      )}
-       {!imageUrl && !isLoading && (
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <ImageIcon className="w-8 h-8" />
-            <span className="text-xs">Image not available</span>
-        </div>
-      )}
-    </div>
-  );
-};
+const SuggestionCardImage = ({ suggestion }: { suggestion: ActivitySuggestion }) => {
+    const { imagePrompt, name } = suggestion;
+    const [image, setImage] = useState<{imageUrl: string; description: string} | null>(null);
+  
+    useEffect(() => {
+      const bestMatch = getBestPlaceholder(imagePrompt);
+      setImage(bestMatch);
+    }, [imagePrompt]);
+  
+    return (
+      <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
+        {!image && (
+          <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
+              <ImageIcon className="w-8 h-8" />
+              <span className="text-xs">Loading image...</span>
+          </div>
+        )}
+        {image && (
+          <Image
+            src={image.imageUrl}
+            alt={name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        )}
+      </div>
+    );
+  };
 
 
 const SuggestionCard = ({
   item,
-  location,
   onAddToItinerary,
   isAdded,
   distance
 }: {
-  item: SuggestionWithImage,
-  location: string,
-  onAddToItinerary: (suggestion: SuggestionWithImage) => void,
+  item: ActivitySuggestion,
+  onAddToItinerary: (suggestion: ActivitySuggestion) => void,
   isAdded: boolean,
   distance: number | null
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <SuggestionCardImage suggestion={item} location={location} />
+      <SuggestionCardImage suggestion={item} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -146,7 +139,7 @@ const getDistance = (coord1: Coordinates, coord2: Coordinates) => {
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState<ActivityType>('tourist attractions');
-  const [suggestions, setSuggestions] = useState<SuggestionWithImage[]>([]);
+  const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
@@ -173,22 +166,19 @@ export default function HolidayPlannerPage() {
     }
   }, [toast]);
 
-  const handleAddToItinerary = (suggestion: SuggestionWithImage) => {
-    // Note: When adding to itinerary, we don't need to preserve the dynamically generated imageUrl
-    // as the itinerary card will generate its own if needed.
-    const { imageUrl, ...suggestionWithoutImage } = suggestion;
-    setItinerary((prev) => [...prev, { ...suggestionWithoutImage, activityType }]);
+  const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
+    setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
   };
 
-  const handleRemoveFromItinerary = (suggestionToRemove: SuggestionWithImage) => {
+  const handleRemoveFromItinerary = (suggestionToRemove: ActivitySuggestion) => {
     setItinerary((prev) => prev.filter((item) => item.name !== suggestionToRemove.name));
   };
 
-  const isSuggestionInItinerary = (suggestion: SuggestionWithImage) => {
+  const isSuggestionInItinerary = (suggestion: ActivitySuggestion) => {
     return itinerary.some((item) => item.name === suggestion.name);
   };
   
-  const handleBookTaxi = (destination: SuggestionWithImage) => {
+  const handleBookTaxi = (destination: ActivitySuggestion) => {
     window.open(`https://www.olacabs.com/`, '_blank');
     toast({
       title: "Redirecting to Ola Cabs...",
@@ -196,7 +186,7 @@ export default function HolidayPlannerPage() {
     })
   }
 
-  const handleBookMovie = (destination: SuggestionWithImage) => {
+  const handleBookMovie = (destination: ActivitySuggestion) => {
     window.open(`https://in.bookmyshow.com/`, '_blank');
     toast({
       title: "Redirecting to BookMyShow...",
@@ -204,7 +194,7 @@ export default function HolidayPlannerPage() {
     })
   }
   
-  const handleOrderFood = (destination: SuggestionWithImage) => {
+  const handleOrderFood = (destination: ActivitySuggestion) => {
     window.open(`https://www.zomato.com/`, '_blank');
     toast({
       title: "Redirecting to Zomato...",
@@ -323,7 +313,6 @@ export default function HolidayPlannerPage() {
                 <SuggestionCard 
                   key={`${item.name}-${index}`}
                   item={item} 
-                  location={location}
                   onAddToItinerary={handleAddToItinerary}
                   isAdded={isSuggestionInItinerary(item)}
                   distance={userCoords ? getDistance(userCoords, item) : null}
@@ -342,7 +331,6 @@ export default function HolidayPlannerPage() {
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
                     <div className="flex items-center gap-4">
                        <div className="w-16 h-16 rounded-md bg-muted flex-shrink-0">
-                         {/* Itinerary items could also generate images, or show a static icon */}
                          <ImageIcon className="w-full h-full object-cover text-muted-foreground p-4"/>
                        </div>
                       <div className="flex-grow">
