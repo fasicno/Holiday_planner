@@ -39,8 +39,11 @@ export async function suggestActivities(input: SuggestActivitiesInput): Promise<
   
   result.suggestions.forEach((suggestion, index) => {
     // Try to find a relevant placeholder based on the hint
-    const hint = suggestion.imageHint?.toLowerCase() || '';
-    let placeholder = activityPlaceholders.find(p => hint.includes(p.imageHint.split(' ')[0]));
+    const hintWords = (suggestion.imageHint?.toLowerCase() || '').split(' ');
+    let placeholder = activityPlaceholders.find(p => {
+      const placeholderHintWords = p.imageHint.toLowerCase().split(' ');
+      return hintWords.some(hw => placeholderHintWords.includes(hw));
+    });
     
     // Fallback to cycling through placeholders if no specific match is found
     if (!placeholder) {
