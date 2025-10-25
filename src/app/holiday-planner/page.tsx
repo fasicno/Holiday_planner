@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -23,17 +23,18 @@ import { useToast } from '@/hooks/use-toast';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
+type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
 
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState<ActivityType>('tourist attractions');
   const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
-  const [itinerary, setItinerary] = useState<ActivitySuggestion[]>([]);
+  const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
-    setItinerary((prev) => [...prev, suggestion]);
+    setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
   };
 
   const handleRemoveFromItinerary = (suggestionToRemove: ActivitySuggestion) => {
@@ -49,6 +50,14 @@ export default function HolidayPlannerPage() {
     toast({
       title: "Redirecting to Ola Cabs...",
       description: `Continue your booking for ${destination.name} on the Ola website.`,
+    })
+  }
+
+  const handleBookMovie = (destination: ActivitySuggestion) => {
+    window.open(`https://in.bookmyshow.com/`, '_blank');
+    toast({
+      title: "Redirecting to BookMyShow...",
+      description: `Continue your booking for ${destination.name} on the BookMyShow website.`,
     })
   }
 
@@ -190,26 +199,49 @@ export default function HolidayPlannerPage() {
                     <p className="text-sm text-muted-foreground">{item.address}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <Car className="mr-2" />
-                            Book Taxi
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleBookTaxi(item)}>Continue</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                    {item.activityType === 'movies' ? (
+                       <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Clapperboard className="mr-2" />
+                              Book Ticket
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Book a movie ticket?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will open the BookMyShow website in a new tab to book a ticket for {item.name}.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleBookMovie(item)}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                    ) : (
+                       <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Car className="mr-2" />
+                              Book Taxi
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleBookTaxi(item)}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                    )}
 
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveFromItinerary(item)}>
                       <X className="h-4 w-4" />
