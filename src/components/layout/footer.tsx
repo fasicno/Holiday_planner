@@ -54,11 +54,11 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             <ClientOnly>
               <>© {new Date().getFullYear()} Holiday Planner. All rights reserved.</>
             </ClientOnly>
-          </p>
+          </div>
           <div className="flex items-center gap-4">
             <Link href="#" aria-label="Twitter">
               <Twitter className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
