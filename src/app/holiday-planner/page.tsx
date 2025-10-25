@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,29 +21,59 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { ClientOnly } from '@/components/client-only';
+import placeholderData from '@/lib/placeholder-images.json';
+import { cn } from '@/lib/utils';
+
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
-type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
+type SuggestionWithImage = ActivitySuggestion & { imageUrl: string; imageHint: string };
+type ItineraryItem = SuggestionWithImage & { activityType: ActivityType };
+
 
 type Coordinates = {
   latitude: number;
   longitude: number;
 };
 
+const getBestPlaceholder = (hint: string) => {
+    const hintWords = hint.toLowerCase().split(/\s+/);
+    let bestMatch = placeholderData.placeholderImages[0]; // Default fallback
+    let maxMatch = 0;
 
-const SuggestionCard = ({ 
-  item, 
+    for (const placeholder of placeholderData.placeholderImages) {
+        const placeholderHintWords = placeholder.imageHint.toLowerCase().split(/\s+/);
+        const currentMatches = hintWords.filter(word => placeholderHintWords.includes(word)).length;
+
+        if (currentMatches > maxMatch) {
+            maxMatch = currentMatches;
+            bestMatch = placeholder;
+        }
+    }
+    return bestMatch;
+}
+
+const SuggestionCard = ({
+  item,
   onAddToItinerary,
   isAdded,
   distance
-}: { 
-  item: ActivitySuggestion, 
-  onAddToItinerary: (suggestion: ActivitySuggestion) => void,
+}: {
+  item: SuggestionWithImage,
+  onAddToItinerary: (suggestion: SuggestionWithImage) => void,
   isAdded: boolean,
   distance: number | null
 }) => (
-    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
+    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
+      <div className="relative h-48 w-full overflow-hidden">
+        <Image
+          src={item.imageUrl}
+          alt={item.description}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          data-ai-hint={item.imageHint}
+        />
+      </div>
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -86,7 +117,7 @@ const getDistance = (coord1: Coordinates, coord2: Coordinates) => {
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState<ActivityType>('tourist attractions');
-  const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestionWithImage[]>([]);
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
@@ -113,19 +144,19 @@ export default function HolidayPlannerPage() {
     }
   }, [toast]);
 
-  const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
+  const handleAddToItinerary = (suggestion: SuggestionWithImage) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
   };
 
-  const handleRemoveFromItinerary = (suggestionToRemove: ActivitySuggestion) => {
+  const handleRemoveFromItinerary = (suggestionToRemove: SuggestionWithImage) => {
     setItinerary((prev) => prev.filter((item) => item.name !== suggestionToRemove.name));
   };
 
-  const isSuggestionInItinerary = (suggestion: ActivitySuggestion) => {
+  const isSuggestionInItinerary = (suggestion: SuggestionWithImage) => {
     return itinerary.some((item) => item.name === suggestion.name);
   };
   
-  const handleBookTaxi = (destination: ActivitySuggestion) => {
+  const handleBookTaxi = (destination: SuggestionWithImage) => {
     window.open(`https://www.olacabs.com/`, '_blank');
     toast({
       title: "Redirecting to Ola Cabs...",
@@ -133,7 +164,7 @@ export default function HolidayPlannerPage() {
     })
   }
 
-  const handleBookMovie = (destination: ActivitySuggestion) => {
+  const handleBookMovie = (destination: SuggestionWithImage) => {
     window.open(`https://in.bookmyshow.com/`, '_blank');
     toast({
       title: "Redirecting to BookMyShow...",
@@ -141,7 +172,7 @@ export default function HolidayPlannerPage() {
     })
   }
   
-  const handleOrderFood = (destination: ActivitySuggestion) => {
+  const handleOrderFood = (destination: SuggestionWithImage) => {
     window.open(`https://www.zomato.com/`, '_blank');
     toast({
       title: "Redirecting to Zomato...",
@@ -157,7 +188,15 @@ export default function HolidayPlannerPage() {
     setSuggestions([]);
     try {
       const result = await suggestActivities({ location, activityType });
-      setSuggestions(result.suggestions);
+      const suggestionsWithImages = result.suggestions.map((suggestion) => {
+        const placeholder = getBestPlaceholder(suggestion.imageHint);
+        return {
+            ...suggestion,
+            imageUrl: placeholder.imageUrl,
+            imageHint: placeholder.imageHint, // Use the matched hint for data attribute
+        };
+      });
+      setSuggestions(suggestionsWithImages);
     } catch (error) {
       console.error("Failed to get suggestions:", error);
       toast({
@@ -235,13 +274,14 @@ export default function HolidayPlannerPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
                <Card key={i}>
+                  <div className="h-48 w-full bg-muted animate-pulse rounded-t-lg"></div>
                   <CardHeader>
                       <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
+                      <div className="h-4 bg-muted rounded w-1/2 animate-pulse mt-2"></div>
                   </CardHeader>
                   <CardContent className="space-y-2">
                       <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
                       <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
-                      <div className="h-4 bg-muted rounded w-1/2 animate-pulse mt-2"></div>
                   </CardContent>
                   <CardFooter>
                       <div className="h-10 bg-muted rounded w-full animate-pulse"></div>
@@ -275,9 +315,19 @@ export default function HolidayPlannerPage() {
               <CardContent className="p-6 space-y-4">
                 {itinerary.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
-                    <div className="flex-grow">
-                      <h3 className="font-bold">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">{item.address}</p>
+                    <div className="flex items-center gap-4">
+                       <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="rounded-md object-cover h-16 w-16"
+                          data-ai-hint={item.imageHint}
+                        />
+                      <div className="flex-grow">
+                        <h3 className="font-bold">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground">{item.address}</p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap justify-end">
                       {item.activityType === 'movies' && (
