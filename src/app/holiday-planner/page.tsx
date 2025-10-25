@@ -24,7 +24,7 @@ import { ClientOnly } from '@/components/client-only';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
-type ItineraryItem = ActivitySuggestion & { activityType: ActivityType };
+type ItineraryItem = ActivitySuggestion & { activityType: ActivityType; distance: number | null };
 
 
 type Coordinates = {
@@ -76,7 +76,7 @@ const SuggestionCard = ({
   location,
 }: {
   item: ActivitySuggestion,
-  onAddToItinerary: (suggestion: ActivitySuggestion) => void,
+  onAddToItinerary: (suggestion: ActivitySuggestion, distance: number | null) => void,
   isAdded: boolean,
   distance: number | null,
   location: string,
@@ -99,7 +99,7 @@ const SuggestionCard = ({
       <CardFooter>
         <Button
           className="w-full"
-          onClick={() => onAddToItinerary(item)}
+          onClick={() => onAddToItinerary(item, distance)}
           disabled={isAdded}
         >
           <Plus className="mr-2" />
@@ -154,8 +154,8 @@ export default function HolidayPlannerPage() {
     }
   }, [toast]);
 
-  const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
-    setItinerary((prev) => [...prev, { ...suggestion, activityType }]);
+  const handleAddToItinerary = (suggestion: ActivitySuggestion, distance: number | null) => {
+    setItinerary((prev) => [...prev, { ...suggestion, activityType, distance }]);
   };
 
   const handleRemoveFromItinerary = (suggestionToRemove: ActivitySuggestion) => {
@@ -307,16 +307,19 @@ export default function HolidayPlannerPage() {
           <div>
             <h2 className="text-3xl font-headline font-bold text-center mb-8">Your AI-Powered Suggestions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {suggestions.map((item, index) => (
-                <SuggestionCard 
-                  key={`${item.name}-${index}`}
-                  item={item} 
-                  onAddToItinerary={handleAddToItinerary}
-                  isAdded={isSuggestionInItinerary(item)}
-                  distance={userCoords ? getDistance(userCoords, item) : null}
-                  location={location}
-                />
-              ))}
+              {suggestions.map((item, index) => {
+                const distance = userCoords ? getDistance(userCoords, item) : null;
+                return (
+                  <SuggestionCard 
+                    key={`${item.name}-${index}`}
+                    item={item} 
+                    onAddToItinerary={handleAddToItinerary}
+                    isAdded={isSuggestionInItinerary(item)}
+                    distance={distance}
+                    location={location}
+                  />
+                )
+              })}
             </div>
           </div>
         )}
@@ -382,12 +385,12 @@ export default function HolidayPlannerPage() {
                             </AlertDialogContent>
                           </AlertDialog>
                       )}
-                      {item.activityType === 'travel' && searchCountry && item.country !== searchCountry && (
+                      {item.activityType === 'travel' && (item.country !== searchCountry || (item.distance && item.distance > 100)) && (
                           <Button variant="outline" size="sm" onClick={() => handleBookTravel('flight', item)}>
                               <Plane className="mr-2" /> Book Flight
                           </Button>
                       )}
-                      {item.activityType === 'travel' && searchCountry && item.country === searchCountry && (
+                      {item.activityType === 'travel' && item.country === searchCountry && item.distance && item.distance <= 100 && (
                           <>
                             <Button variant="outline" size="sm" onClick={() => handleBookTravel('train', item)}>
                                 <Train className="mr-2" /> Book Train
