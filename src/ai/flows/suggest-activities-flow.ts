@@ -20,6 +20,7 @@ const ActivitySuggestionSchema = z.object({
     name: z.string().describe('The name of the place or activity.'),
     description: z.string().describe('A short, compelling description of the activity.'),
     address: z.string().describe('The approximate address or area.'),
+    country: z.string().describe('The country where the suggestion is located.'),
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
     latitude: z.number().describe('The latitude of the location.'),
     longitude: z.number().describe('The longitude of the location.'),
@@ -28,6 +29,7 @@ const ActivitySuggestionSchema = z.object({
 
 const SuggestActivitiesOutputSchema = z.object({
   suggestions: z.array(ActivitySuggestionSchema).describe('A list of 10-12 activity suggestions.'),
+  searchCountry: z.string().describe("The country of the user's search location. For example, if the user enters 'Paris', this should be 'France'.")
 });
 export type SuggestActivitiesOutput = z.infer<typeof SuggestActivitiesOutputSchema>;
 
@@ -43,9 +45,11 @@ const prompt = ai.definePrompt({
 
 Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions.
 
+Also, identify the country of the user's search location.
+
 For the 'travel' activity type, suggest major travel hubs like airports, train stations, and bus terminals.
 
-For each suggestion, provide a name, a short, compelling description, an address, a website URL if one is available, the precise latitude and longitude, and a few keywords to help find a relevant image for the location.
+For each suggestion, provide a name, a short, compelling description, an address, the country it is in, a website URL if one is available, the precise latitude and longitude, and a few keywords to help find a relevant image for the location.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,

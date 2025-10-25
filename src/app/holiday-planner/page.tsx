@@ -130,6 +130,7 @@ export default function HolidayPlannerPage() {
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
+  const [searchCountry, setSearchCountry] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -206,6 +207,7 @@ export default function HolidayPlannerPage() {
     try {
       const result = await suggestActivities({ location, activityType });
       setSuggestions(result.suggestions);
+      setSearchCountry(result.searchCountry);
     } catch (error) {
       console.error("Failed to get suggestions:", error);
       toast({
@@ -380,11 +382,13 @@ export default function HolidayPlannerPage() {
                             </AlertDialogContent>
                           </AlertDialog>
                       )}
-                      {item.activityType === 'travel' && (
+                      {item.activityType === 'travel' && searchCountry && item.country !== searchCountry && (
+                          <Button variant="outline" size="sm" onClick={() => handleBookTravel('flight', item)}>
+                              <Plane className="mr-2" /> Book Flight
+                          </Button>
+                      )}
+                      {item.activityType === 'travel' && searchCountry && item.country === searchCountry && (
                           <>
-                            <Button variant="outline" size="sm" onClick={() => handleBookTravel('flight', item)}>
-                                <Plane className="mr-2" /> Book Flight
-                            </Button>
                             <Button variant="outline" size="sm" onClick={() => handleBookTravel('train', item)}>
                                 <Train className="mr-2" /> Book Train
                             </Button>
