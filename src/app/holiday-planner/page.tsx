@@ -1,20 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Loader2, Wand2, X, Plus } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
+type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
 
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState<ActivityType>('tourist attractions');
-  const [suggestions, setSuggestions] = useState<SuggestActivitiesOutput['suggestions']>([]);
+  const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
+  const [itinerary, setItinerary] = useState<ActivitySuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleAddToItinerary = (suggestion: ActivitySuggestion) => {
+    setItinerary((prev) => [...prev, suggestion]);
+  };
+
+  const handleRemoveFromItinerary = (suggestionToRemove: ActivitySuggestion) => {
+    setItinerary((prev) => prev.filter((item) => item.name !== suggestionToRemove.name));
+  };
+
+  const isSuggestionInItinerary = (suggestion: ActivitySuggestion) => {
+    return itinerary.some((item) => item.name === suggestion.name);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +137,14 @@ export default function HolidayPlannerPage() {
                   <p className="text-sm font-medium text-primary pt-2">{item.address}</p>
                 </CardContent>
                 <div className="p-6 pt-0">
-                    <Button className="w-full">Add to Itinerary</Button>
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleAddToItinerary(item)}
+                      disabled={isSuggestionInItinerary(item)}
+                    >
+                      <Plus className="mr-2"/>
+                      Add to Itinerary
+                    </Button>
                 </div>
               </Card>
             ))}
@@ -131,14 +152,36 @@ export default function HolidayPlannerPage() {
         </div>
       )}
 
-       {!isLoading && suggestions.length === 0 && (
-         <div className="mt-16 text-center">
-             <h2 className="text-3xl font-headline font-bold mb-4">Your Itinerary</h2>
-             <Card className="max-w-3xl mx-auto p-8 text-center">
-                <p className="text-muted-foreground">Enter a location above to get started. Your planned activities will appear here.</p>
-             </Card>
-         </div>
-       )}
+      {itinerary.length > 0 ? (
+        <div className="mt-16">
+          <h2 className="text-3xl font-headline font-bold text-center mb-8">Your Itinerary</h2>
+          <Card className="max-w-3xl mx-auto">
+            <CardContent className="p-6 space-y-4">
+              {itinerary.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
+                  <div>
+                    <h3 className="font-bold">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">{item.address}</p>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => handleRemoveFromItinerary(item)}>
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Remove from itinerary</span>
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+         !isLoading && suggestions.length === 0 && (
+           <div className="mt-16 text-center">
+               <h2 className="text-3xl font-headline font-bold mb-4">Your Itinerary</h2>
+               <Card className="max-w-3xl mx-auto p-8 text-center">
+                  <p className="text-muted-foreground">Enter a location above to get started. Your planned activities will appear here.</p>
+               </Card>
+           </div>
+         )
+      )}
     </div>
   );
 }
