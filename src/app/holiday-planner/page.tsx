@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, ImageIcon } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
-import { generateImage } from '@/ai/flows/generate-image-flow';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,46 +38,20 @@ const SuggestionCardImage = ({ suggestion, location }: { suggestion: ActivitySug
     const [isImageLoading, setIsImageLoading] = useState(true);
   
     useEffect(() => {
-      let isCancelled = false;
-      const fetchImage = async () => {
-        if (!imagePrompt) return; // Don't fetch if there's no prompt
         setIsImageLoading(true);
-        try {
-          const imageResult = await generateImage({ 
-            imagePrompt,
-            location,
-            name,
-            description,
-           });
-          if (!isCancelled && imageResult.imageUrl) {
-            setImageUrl(imageResult.imageUrl);
-          }
-        } catch (error) {
-          console.error("Failed to generate image:", error);
-          if (!isCancelled) {
-             // Fallback to a generic placeholder if generation fails
-             setImageUrl('https://picsum.photos/seed/placeholder/600/400');
-          }
-        } finally {
-            if (!isCancelled) {
-                setIsImageLoading(false);
-            }
-        }
-      };
-  
-      fetchImage();
-  
-      return () => {
-        isCancelled = true;
-      };
-    }, [imagePrompt, location, name, description]);
+        // Using a consistent seed for picsum.photos based on the suggestion name
+        // This ensures the same image is shown for the same suggestion, but is unique otherwise.
+        const seed = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        setImageUrl(`https://picsum.photos/seed/${seed}/600/400`);
+        setIsImageLoading(false);
+    }, [name]);
   
     return (
       <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
         {isImageLoading && (
           <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
             <ImageIcon className="w-8 h-8" />
-            <span className="text-xs">Generating image...</span>
+            <span className="text-xs">Loading image...</span>
           </div>
         )}
         {imageUrl && !isImageLoading && (
@@ -87,6 +60,7 @@ const SuggestionCardImage = ({ suggestion, location }: { suggestion: ActivitySug
             alt={name}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            data-ai-hint={imagePrompt}
           />
         )}
       </div>
