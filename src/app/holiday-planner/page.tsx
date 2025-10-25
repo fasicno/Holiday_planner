@@ -296,7 +296,7 @@ export default function HolidayPlannerPage() {
                           <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
                           <AlertDialogDescription>
                             This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
-                          </BrowserRouter>
+                          </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
