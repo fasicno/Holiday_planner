@@ -24,7 +24,7 @@ const ActivitySuggestionSchema = z.object({
 });
 
 const SuggestActivitiesOutputSchema = z.object({
-  suggestions: z.array(ActivitySuggestionSchema).describe('A list of 5-7 activity suggestions.'),
+  suggestions: z.array(ActivitySuggestionSchema).describe('A list of 10-12 activity suggestions.'),
 });
 export type SuggestActivitiesOutput = z.infer<typeof SuggestActivitiesOutputSchema>;
 
@@ -38,9 +38,9 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestActivitiesOutputSchema},
   prompt: `You are an expert travel agent. A user is asking for suggestions for their holiday.
 
-Based on the user's location and desired activity type, provide a list of 5-7 specific and interesting suggestions.
+Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions.
 
-For each suggestion, provide a name, a short description, an address, and a website URL if one is available.
+For each suggestion, provide a name, a short, compelling description, an address, and a website URL if one is available.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,
