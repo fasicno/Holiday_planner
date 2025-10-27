@@ -32,6 +32,29 @@ type Coordinates = {
   longitude: number;
 };
 
+const SuggestionCardImage = ({photoReference, name}: {photoReference?: string, name: string}) => {
+  if (!photoReference) {
+    return (
+      <div className="relative h-52 w-full bg-muted flex items-center justify-center">
+        <MapPin className="w-12 h-12 text-muted-foreground/50" />
+      </div>
+    );
+  }
+
+  const imageUrl = `/api/photo?photo_reference=${photoReference}`;
+
+  return (
+    <div className="relative h-52 w-full overflow-hidden">
+      <Image 
+        src={imageUrl}
+        alt={`Photo of ${name}`}
+        fill
+        className="object-cover transition-transform duration-500 group-hover:scale-110"
+      />
+    </div>
+  );
+};
+
 const SuggestionCard = ({
   item,
   onAddToItinerary,
@@ -46,6 +69,7 @@ const SuggestionCard = ({
   location: string,
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
+      <SuggestionCardImage photoReference={item.photoReference} name={item.name} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -264,6 +288,7 @@ export default function HolidayPlannerPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
                <Card key={i}>
+                    <div className="h-52 w-full bg-muted animate-pulse"></div>
                   <CardHeader>
                       <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
                       <div className="h-4 bg-muted rounded w-1/2 animate-pulse mt-2"></div>
@@ -310,7 +335,17 @@ export default function HolidayPlannerPage() {
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
                     <div className="flex items-center gap-4">
                        <div className="w-12 h-12 rounded-md bg-muted flex-shrink-0 flex items-center justify-center">
-                          {getActivityIcon(item.activityType)}
+                          {item.photoReference ? (
+                            <Image
+                              src={`/api/photo?photo_reference=${item.photoReference}`}
+                              alt={item.name}
+                              width={48}
+                              height={48}
+                              className="object-cover rounded-md"
+                            />
+                          ) : (
+                            getActivityIcon(item.activityType)
+                          )}
                        </div>
                       <div className="flex-grow">
                         <h3 className="font-bold">{item.name}</h3>
