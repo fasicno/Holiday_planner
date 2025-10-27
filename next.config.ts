@@ -3,6 +3,7 @@ import type {NextConfig} from 'next';
 const isGithubActions = process.env.GITHUB_ACTIONS === 'true'
 
 const nextConfig: NextConfig = {
+  output: 'export',
   basePath: isGithubActions ? '/Holiday_planner' : '',
   assetPrefix: isGithubActions ? '/Holiday_planner/' : '',
   typescript: {
@@ -39,7 +40,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'https://',
         hostname: 'upload.wikimedia.org',
         port: '',
         pathname: '/**',
