@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { ClientOnly } from '@/components/client-only';
+import { getLocation } from '@/ai/flows/get-location-flow';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
@@ -121,25 +122,47 @@ export default function HolidayPlannerPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserCoords({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.warn("Geolocation permission denied. Distance calculations will be unavailable.", error);
-          toast({
-            variant: "destructive",
-            title: "Location Access Denied",
-            description: "Could not get your location. Distances to suggestions will not be shown.",
-          });
+    // 1. Try to get location from IP address first
+    getLocation()
+      .then(data => {
+        if (data?.city) {
+          setLocation(data.city);
         }
-      );
-    }
-  }, [toast]);
+      })
+      .catch(error => {
+        console.warn("IP-based location fetch failed:", error);
+      })
+      .finally(() => {
+        // 2. Fallback to browser's geolocation API
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              setUserCoords({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+              // If location input is still empty, try to use browser location (less reliable for city name)
+              if (!location) {
+                 toast({
+                    title: "Location Detected",
+                    description: "Using your current browser location.",
+                  });
+              }
+            },
+            (error) => {
+              console.warn("Geolocation permission denied. Distance calculations will be unavailable.", error);
+              if (!location) { // Only show toast if IP lookup also failed
+                 toast({
+                  variant: "destructive",
+                  title: "Location Access Denied",
+                  description: "Could not get your location automatically. Please enter it manually.",
+                });
+              }
+            }
+          );
+        }
+      });
+  }, [toast, location]);
 
   const handleAddToItinerary = (suggestion: ActivitySuggestion, distance: number | null) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType, distance }]);
