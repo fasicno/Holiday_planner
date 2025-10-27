@@ -23,10 +23,10 @@ export default function Home() {
         <div className="absolute inset-0 bg-primary/40" />
         <div className="relative z-10 container px-4 md:px-6 space-y-6">
           <h1 className="text-4xl md:text-6xl font-headline font-bold tracking-tight text-shadow-lg">
-            Unforgettable Journeys, Effortlessly Crafted
+            Your Adventure Starts Here.
           </h1>
           <p className="max-w-3xl mx-auto text-lg md:text-xl text-shadow">
-            From spontaneous getaways to meticulously planned adventures, our AI-powered planner is your key to unlocking the world. Discover and book your next trip with ease.
+            The simple way to plan your next holiday. Discover and organize your trip with ease.
           </p>
            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground mt-4">
                 <Link href="/holiday-planner">
