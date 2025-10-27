@@ -2,36 +2,62 @@ import {NextResponse} from 'next/server';
 
 export async function GET(request: Request) {
   const {searchParams} = new URL(request.url);
-  const photoReference = searchParams.get('photo_reference');
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  const imageQuery = searchParams.get('image_query');
+  const apiKey = process.env.UNSPLASH_ACCESS_KEY;
 
-  if (!photoReference || !apiKey) {
-    return new NextResponse('Missing photo reference or API key', {
+  if (!imageQuery) {
+    return new NextResponse('Missing image query', {
       status: 400,
     });
   }
 
-  const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${apiKey}`;
+  if (!apiKey) {
+    return new NextResponse('Missing Unsplash API key', { status: 500 });
+  }
+
+  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+    imageQuery
+  )}&per_page=1&orientation=landscape`;
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      const errorText = await response.text();
+    const unsplashResponse = await fetch(url, {
+      headers: {
+        Authorization: `Client-ID ${apiKey}`,
+      },
+    });
+
+    if (!unsplashResponse.ok) {
+      const errorText = await unsplashResponse.text();
       console.error(
-        `Failed to fetch photo from Google Places API: ${response.status} ${response.statusText}`,
+        `Failed to fetch photo from Unsplash API: ${unsplashResponse.status} ${unsplashResponse.statusText}`,
         errorText
       );
       return new NextResponse(
-        `Failed to fetch photo: ${response.statusText}`,
-        {status: response.status}
+        `Failed to fetch photo: ${unsplashResponse.statusText}`,
+        {status: unsplashResponse.status}
       );
     }
-    const imageBlob = await response.blob();
+
+    const data = await unsplashResponse.json();
+    const imageUrl = data.results[0]?.urls?.regular;
+
+    if (!imageUrl) {
+        return new NextResponse('No image found for query', { status: 404 });
+    }
+
+    // Fetch the image blob from the URL
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+         return new NextResponse('Failed to download image', { status: 500 });
+    }
+    const imageBlob = await imageResponse.blob();
     const headers = new Headers();
     headers.set('Content-Type', imageBlob.type);
+    
     return new NextResponse(imageBlob, {status: 200, headers});
+
   } catch (error: any) {
-    console.error('Error fetching photo:', error);
+    console.error('Error fetching photo from Unsplash:', error);
     return new NextResponse('Internal server error', {status: 500});
   }
 }

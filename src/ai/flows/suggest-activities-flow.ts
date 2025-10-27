@@ -24,8 +24,7 @@ const ActivitySuggestionSchema = z.object({
     website: z.string().optional().describe('The official website URL for the suggestion, if available.'),
     latitude: z.number().describe('The latitude of the location.'),
     longitude: z.number().describe('The longitude of the location.'),
-    photoReference: z.string().optional().describe('A valid Google Places photo reference string. This is used to fetch an image for the location.'),
-    placeId: z.string().optional().describe('The unique Google Places ID for the location.'),
+    imageQuery: z.string().optional().describe('A concise, descriptive search query (2-4 words) for finding a high-quality photo of this location on a stock photo website like Unsplash. Example: "Eiffel Tower night".'),
 });
 
 const SuggestActivitiesOutputSchema = z.object({
@@ -44,7 +43,7 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestActivitiesOutputSchema},
   prompt: `You are an expert travel agent. A user is asking for suggestions for their holiday.
 
-Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions. For each suggestion, you MUST use Google Places to find its unique placeId and a valid photo_reference.
+Based on the user's location and desired activity type, provide a list of 10-12 specific and interesting suggestions. For each suggestion, you MUST provide a search query that can be used to find a photo on a stock photo website.
 
 Also, identify the country of the user's search location.
 
@@ -57,8 +56,7 @@ For each suggestion, you MUST provide the following details:
 - country: The country it is in.
 - website: The official website URL, if available.
 - latitude and longitude: The precise geographic coordinates.
-- photoReference: A valid Google Places photo reference.
-- placeId: The unique Google Places ID.
+- imageQuery: A concise, descriptive search query (2-4 words) for finding a high-quality photo of this location on a stock photo website.
 
 Location: {{{location}}}
 Activity Type: {{{activityType}}}`,

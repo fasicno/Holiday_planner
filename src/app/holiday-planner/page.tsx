@@ -32,8 +32,8 @@ type Coordinates = {
   longitude: number;
 };
 
-const SuggestionCardImage = ({photoReference, name}: {photoReference?: string, name: string}) => {
-  if (!photoReference) {
+const SuggestionCardImage = ({imageQuery, name}: {imageQuery?: string, name: string}) => {
+  if (!imageQuery) {
     return (
       <div className="relative h-52 w-full bg-muted flex items-center justify-center">
         <MapPin className="w-12 h-12 text-muted-foreground/50" />
@@ -41,7 +41,7 @@ const SuggestionCardImage = ({photoReference, name}: {photoReference?: string, n
     );
   }
 
-  const imageUrl = `/api/photo?photo_reference=${photoReference}`;
+  const imageUrl = `/api/photo?image_query=${encodeURIComponent(imageQuery)}`;
 
   return (
     <div className="relative h-52 w-full overflow-hidden">
@@ -69,7 +69,7 @@ const SuggestionCard = ({
   location: string,
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <SuggestionCardImage photoReference={item.photoReference} name={item.name} />
+      <SuggestionCardImage imageQuery={item.imageQuery} name={item.name} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -335,9 +335,9 @@ export default function HolidayPlannerPage() {
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
                     <div className="flex items-center gap-4">
                        <div className="w-12 h-12 rounded-md bg-muted flex-shrink-0 flex items-center justify-center">
-                          {item.photoReference ? (
+                          {item.imageQuery ? (
                             <Image
-                              src={`/api/photo?photo_reference=${item.photoReference}`}
+                              src={`/api/photo?image_query=${encodeURIComponent(item.imageQuery)}`}
                               alt={item.name}
                               width={48}
                               height={48}
@@ -424,7 +424,7 @@ export default function HolidayPlannerPage() {
                             <AlertDialogTitle>Book a taxi?</AlertDialogTitle>
                             <AlertDialogDescription>
                               This will open the Ola Cabs website in a new tab to book a ride to {item.name}.
-                            </AlertDialogDescription>
+                            </descriptio>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
