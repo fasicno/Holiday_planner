@@ -3,8 +3,8 @@ import type {NextConfig} from 'next';
 const isGithubActions = process.env.GITHUB_ACTIONS === 'true'
 
 const nextConfig: NextConfig = {
-  basePath: isGithubActions ? '/holiday-planner' : '',
-  assetPrefix: isGithubActions ? '/holiday-planner/' : '',
+  basePath: isGithubActions ? '/Holiday_planner' : '',
+  assetPrefix: isGithubActions ? '/Holiday_planner/' : '',
   typescript: {
     ignoreBuildErrors: true,
   },
