@@ -24,9 +24,9 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">Quick Links</h4>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
+              <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
+              <li><Link href="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
               <li><Link href="/holiday-planner" className="text-muted-foreground hover:text-primary transition-colors">Planner</Link></li>
             </ul>
           </div>
@@ -34,9 +34,9 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">Legal</h4>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Cookie Policy</Link></li>
+              <li><Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link href="/cookies" className="text-muted-foreground hover:text-primary transition-colors">Cookie Policy</Link></li>
             </ul>
           </div>
           

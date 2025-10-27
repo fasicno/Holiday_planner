@@ -33,6 +33,9 @@ export function Header() {
           <Button variant="ghost" asChild>
             <Link href="/holiday-planner">Planner</Link>
           </Button>
+          <Button variant="ghost" asChild>
+            <Link href="/blog">Blog</Link>
+          </Button>
           {isUserLoading ? (
             <Loader2 className="h-6 w-6 animate-spin" />
           ) : user ? (
