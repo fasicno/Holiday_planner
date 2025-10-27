@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, ImageIcon, Plane, Train, Bus } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, Plane, Train, Bus, Building } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -32,36 +32,6 @@ type Coordinates = {
   longitude: number;
 };
 
-const SuggestionCardImage = ({ suggestion }: { suggestion: ActivitySuggestion }) => {
-  const { photoReference, name } = suggestion;
-
-  if (!photoReference) {
-    return (
-      <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-          <ImageIcon className="w-8 h-8" />
-          <span className="text-xs">No image available</span>
-        </div>
-      </div>
-    );
-  }
-
-  const imageUrl = `/api/photo?photo_reference=${photoReference}`;
-
-  return (
-    <div className="relative h-48 w-full overflow-hidden bg-muted flex items-center justify-center">
-      <Image
-        src={imageUrl}
-        alt={name}
-        fill
-        className="object-cover transition-transform duration-300 group-hover:scale-105"
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-      />
-    </div>
-  );
-};
-
-
 const SuggestionCard = ({
   item,
   onAddToItinerary,
@@ -76,7 +46,6 @@ const SuggestionCard = ({
   location: string,
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
-      <SuggestionCardImage suggestion={item} />
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
         <CardDescription>{item.address}</CardDescription>
@@ -214,6 +183,21 @@ export default function HolidayPlannerPage() {
     }
   };
 
+  const getActivityIcon = (activityType: ActivityType) => {
+    switch (activityType) {
+        case 'restaurants':
+            return <UtensilsCrossed className="w-5 h-5 text-muted-foreground" />;
+        case 'hotels':
+            return <Building className="w-5 h-5 text-muted-foreground" />;
+        case 'movies':
+            return <Clapperboard className="w-5 h-5 text-muted-foreground" />;
+        case 'travel':
+            return <Plane className="w-5 h-5 text-muted-foreground" />;
+        default:
+            return <MapPin className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
+
   return (
     <ClientOnly>
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
@@ -280,7 +264,6 @@ export default function HolidayPlannerPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
                <Card key={i}>
-                  <div className="h-48 w-full bg-muted animate-pulse rounded-t-lg"></div>
                   <CardHeader>
                       <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
                       <div className="h-4 bg-muted rounded w-1/2 animate-pulse mt-2"></div>
@@ -326,17 +309,8 @@ export default function HolidayPlannerPage() {
                 {itinerary.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary">
                     <div className="flex items-center gap-4">
-                       <div className="w-16 h-16 rounded-md bg-muted flex-shrink-0 relative overflow-hidden">
-                          {item.photoReference ? (
-                            <Image 
-                              src={`/api/photo?photo_reference=${item.photoReference}`}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <ImageIcon className="w-full h-full object-cover text-muted-foreground p-4"/>
-                          )}
+                       <div className="w-12 h-12 rounded-md bg-muted flex-shrink-0 flex items-center justify-center">
+                          {getActivityIcon(item.activityType)}
                        </div>
                       <div className="flex-grow">
                         <h3 className="font-bold">{item.name}</h3>
