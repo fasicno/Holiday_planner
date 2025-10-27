@@ -3,7 +3,7 @@ import {NextResponse} from 'next/server';
 export async function GET(request: Request) {
   const {searchParams} = new URL(request.url);
   const imageQuery = searchParams.get('image_query');
-  const apiKey = process.env.UNSPLASH_ACCESS_KEY;
+  const apiKey = "pcNvy4kqdNao8_355ZEJu_vCRQjVNkcNfvSZ271i8y8";
 
   if (!imageQuery) {
     return new NextResponse('Missing image query', {
