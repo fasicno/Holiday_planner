@@ -61,13 +61,11 @@ const SuggestionCard = ({
   onAddToItinerary,
   isAdded,
   distance,
-  location,
 }: {
   item: ActivitySuggestion,
   onAddToItinerary: (suggestion: ActivitySuggestion, distance: number | null) => void,
   isAdded: boolean,
   distance: number | null,
-  location: string,
 }) => (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
       <SuggestionCardImage imageQuery={item.imageQuery} name={item.name} />
@@ -132,61 +130,88 @@ export default function HolidayPlannerPage() {
   const [searchCountry, setSearchCountry] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // 1. Try to get high-accuracy location from browser first
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const coords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-          setUserCoords(coords);
-          
-          const city = await getCityFromCoords(coords);
-          if (city) {
-            setLocation(city);
-            toast({
-              title: "Location Detected",
-              description: `Suggestions are now centered around ${city}.`,
-            });
-          }
-        },
-        (error) => {
-          console.warn("Browser geolocation permission denied:", error.message);
-          // 2. If browser fails, fallback to IP-based location
-          toast({
-            title: "Fetching location...",
-            description: "Using IP address for approximate location.",
-          });
-          getLocation()
-            .then(data => {
-              if (data?.city) {
-                setLocation(data.city);
-                 toast({
-                  title: "Location Detected",
-                  description: `Using approximate location: ${data.city}. For better accuracy, allow location access in your browser.`,
-                });
-              } else {
-                 toast({
-                    variant: "destructive",
-                    title: "Could not detect location",
-                    description: "Please enter your location manually.",
-                });
-              }
-            })
-            .catch(ipError => {
-              console.error("IP-based location fetch also failed:", ipError);
-              toast({
-                variant: "destructive",
-                title: "Location Access Failed",
-                description: "Could not get your location. Please enter it manually.",
-              });
-            });
-        }
-      );
+  const getSuggestions = useCallback(async (loc: string, type: ActivityType) => {
+    if (!loc) return;
+
+    setIsLoading(true);
+    setSuggestions([]);
+    try {
+      const result = await suggestActivities({ location: loc, activityType: type });
+      setSuggestions(result.suggestions);
+      setSearchCountry(result.searchCountry);
+    } catch (error) {
+      console.error("Failed to get suggestions:", error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem getting suggestions. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   }, [toast]);
+
+  useEffect(() => {
+    // This effect runs once to determine the user's location and auto-fetch suggestions.
+    const findLocationAndFetch = async () => {
+        // 1. Try to get high-accuracy location from browser first
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const coords = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    };
+                    setUserCoords(coords);
+                    const city = await getCityFromCoords(coords);
+                    if (city) {
+                        setLocation(city);
+                        toast({
+                            title: "Location Detected",
+                            description: `Showing suggestions for ${city}.`,
+                        });
+                        getSuggestions(city, 'tourist attractions'); // Auto-fetch suggestions
+                    }
+                },
+                (error) => {
+                    console.warn("Browser geolocation permission denied:", error.message);
+                    // 2. If browser fails, fallback to IP-based location
+                    toast({
+                        title: "Fetching location...",
+                        description: "Using IP address for approximate location.",
+                    });
+                    getLocation()
+                        .then(data => {
+                            if (data?.city) {
+                                setLocation(data.city);
+                                toast({
+                                    title: "Location Detected",
+                                    description: `Using approximate location: ${data.city}. For better accuracy, allow location access in your browser.`,
+                                });
+                                getSuggestions(data.city, 'tourist attractions'); // Auto-fetch suggestions
+                            } else {
+                                toast({
+                                    variant: "destructive",
+                                    title: "Could not detect location",
+                                    description: "Please enter your location manually.",
+                                });
+                            }
+                        })
+                        .catch(ipError => {
+                            console.error("IP-based location fetch also failed:", ipError);
+                            toast({
+                                variant: "destructive",
+                                title: "Location Access Failed",
+                                description: "Could not get your location. Please enter it manually.",
+                            });
+                        });
+                }
+            );
+        }
+    };
+
+    findLocationAndFetch();
+  }, [toast, getSuggestions]);
 
   const handleAddToItinerary = (suggestion: ActivitySuggestion, distance: number | null) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType, distance }]);
@@ -232,27 +257,17 @@ export default function HolidayPlannerPage() {
     });
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!location) return;
-
-    setIsLoading(true);
-    setSuggestions([]);
-    try {
-      const result = await suggestActivities({ location, activityType });
-      setSuggestions(result.suggestions);
-      setSearchCountry(result.searchCountry);
-    } catch (error) {
-      console.error("Failed to get suggestions:", error);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem getting suggestions. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    getSuggestions(location, activityType);
   };
+  
+  const handleActivityTypeChange = (type: ActivityType) => {
+    setActivityType(type);
+    if(location) {
+        getSuggestions(location, type);
+    }
+  }
 
   const getActivityIcon = (activityType: ActivityType) => {
     switch (activityType) {
@@ -299,7 +314,7 @@ export default function HolidayPlannerPage() {
               </div>
               <div className="md:col-span-1 space-y-2">
                 <label htmlFor="activity-type" className="text-sm font-medium">Activity Type</label>
-                <Select value={activityType} onValueChange={(value: ActivityType) => setActivityType(value)}>
+                <Select value={activityType} onValueChange={handleActivityTypeChange}>
                   <SelectTrigger id="activity-type">
                     <SelectValue placeholder="Select an activity" />
                   </SelectTrigger>
@@ -365,7 +380,6 @@ export default function HolidayPlannerPage() {
                     onAddToItinerary={handleAddToItinerary}
                     isAdded={isSuggestionInItinerary(item)}
                     distance={distance}
-                    location={location}
                   />
                 )
               })}
@@ -504,3 +518,5 @@ export default function HolidayPlannerPage() {
     </ClientOnly>
   );
 }
+
+    
