@@ -8,7 +8,7 @@ const heroImage = placeholderData.placeholderImages.find(p => p.id === 'hero-bac
 
 export default function Home() {
   return (
-    <div className="space-y-16 md:space-y-24 pb-16 md:pb-24">
+    <div>
       <section className="relative h-[80vh] flex items-center justify-center text-center text-white">
         {heroImage && (
           <Image
