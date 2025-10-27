@@ -110,6 +110,17 @@ const getDistance = (coord1: Coordinates, coord2: Coordinates) => {
   return R * c;
 }
 
+async function getCityFromCoords(coords: Coordinates) {
+  try {
+    const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`);
+    const data = await response.json();
+    return data.city || data.locality || null;
+  } catch (error) {
+    console.error("Reverse geocoding failed:", error);
+    return null;
+  }
+}
+
 
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
@@ -122,47 +133,60 @@ export default function HolidayPlannerPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // 1. Try to get location from IP address first
-    getLocation()
-      .then(data => {
-        if (data?.city) {
-          setLocation(data.city);
-        }
-      })
-      .catch(error => {
-        console.warn("IP-based location fetch failed:", error);
-      })
-      .finally(() => {
-        // 2. Fallback to browser's geolocation API
-        if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              setUserCoords({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-              // If location input is still empty, try to use browser location (less reliable for city name)
-              if (!location) {
+    // 1. Try to get high-accuracy location from browser first
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          setUserCoords(coords);
+          
+          const city = await getCityFromCoords(coords);
+          if (city) {
+            setLocation(city);
+            toast({
+              title: "Location Detected",
+              description: `Suggestions are now centered around ${city}.`,
+            });
+          }
+        },
+        (error) => {
+          console.warn("Browser geolocation permission denied:", error.message);
+          // 2. If browser fails, fallback to IP-based location
+          toast({
+            title: "Fetching location...",
+            description: "Using IP address for approximate location.",
+          });
+          getLocation()
+            .then(data => {
+              if (data?.city) {
+                setLocation(data.city);
                  toast({
-                    title: "Location Detected",
-                    description: "Using your current browser location.",
-                  });
-              }
-            },
-            (error) => {
-              console.warn("Geolocation permission denied. Distance calculations will be unavailable.", error);
-              if (!location) { // Only show toast if IP lookup also failed
+                  title: "Location Detected",
+                  description: `Using approximate location: ${data.city}. For better accuracy, allow location access in your browser.`,
+                });
+              } else {
                  toast({
-                  variant: "destructive",
-                  title: "Location Access Denied",
-                  description: "Could not get your location automatically. Please enter it manually.",
+                    variant: "destructive",
+                    title: "Could not detect location",
+                    description: "Please enter your location manually.",
                 });
               }
-            }
-          );
+            })
+            .catch(ipError => {
+              console.error("IP-based location fetch also failed:", ipError);
+              toast({
+                variant: "destructive",
+                title: "Location Access Failed",
+                description: "Could not get your location. Please enter it manually.",
+              });
+            });
         }
-      });
-  }, [toast, location]);
+      );
+    }
+  }, [toast]);
 
   const handleAddToItinerary = (suggestion: ActivitySuggestion, distance: number | null) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType, distance }]);
