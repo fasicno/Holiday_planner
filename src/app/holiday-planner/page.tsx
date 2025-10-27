@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, Plane, Train, Bus, Building, LocateFixed } from 'lucide-react';
+import { Loader2, Wand2, X, Plus, Car, Clapperboard, UtensilsCrossed, MapPin, Plane, Train, Bus, Building } from 'lucide-react';
 import { suggestActivities, SuggestActivitiesInput, SuggestActivitiesOutput } from '@/ai/flows/suggest-activities-flow';
 import {
   AlertDialog,
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { ClientOnly } from '@/components/client-only';
-import { getLocation } from '@/ai/flows/get-location-flow';
 
 type ActivityType = SuggestActivitiesInput['activityType'];
 type ActivitySuggestion = SuggestActivitiesOutput['suggestions'][0];
@@ -108,31 +107,25 @@ const getDistance = (coord1: Coordinates, coord2: Coordinates) => {
   return R * c;
 }
 
-async function getCityFromCoords(coords: Coordinates) {
-  try {
-    const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`);
-    const data = await response.json();
-    return data.city || data.locality || null;
-  } catch (error) {
-    console.error("Reverse geocoding failed:", error);
-    return null;
-  }
-}
-
-
 export default function HolidayPlannerPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState<ActivityType>('tourist attractions');
   const [suggestions, setSuggestions] = useState<ActivitySuggestion[]>([]);
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
   const [searchCountry, setSearchCountry] = useState<string | null>(null);
   const { toast } = useToast();
 
   const getSuggestions = useCallback(async (loc: string, type: ActivityType) => {
-    if (!loc) return;
+    if (!loc) {
+      toast({
+        variant: "destructive",
+        title: "Location required",
+        description: "Please enter a location to get suggestions.",
+      });
+      return;
+    }
 
     setIsLoading(true);
     setSuggestions([]);
@@ -152,59 +145,6 @@ export default function HolidayPlannerPage() {
     }
   }, [toast]);
   
-  const handleDetectLocation = useCallback(() => {
-    setIsLocating(true);
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const coords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-          setUserCoords(coords);
-          const city = await getCityFromCoords(coords);
-          if (city) {
-            setLocation(city);
-            toast({
-              title: "Location Detected",
-              description: `Showing suggestions for ${city}.`,
-            });
-            // Automatically fetch suggestions for the detected city
-            getSuggestions(city, activityType);
-          } else {
-            toast({
-              variant: "destructive",
-              title: "Could not determine city",
-              description: "Could not find city from your coordinates.",
-            });
-          }
-          setIsLocating(false);
-        },
-        (error) => {
-          console.error("Geolocation error:", error.message);
-          toast({
-            variant: "destructive",
-            title: "Location Access Denied",
-            description: "Please enable location permissions in your browser or enter a location manually.",
-          });
-          setIsLocating(false);
-        }
-      );
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Geolocation Not Supported",
-        description: "Your browser does not support geolocation.",
-      });
-      setIsLocating(false);
-    }
-  }, [toast, getSuggestions, activityType]);
-
-  useEffect(() => {
-    // This effect runs once on mount to prompt for location.
-    handleDetectLocation();
-  }, [handleDetectLocation]);
-
   const handleAddToItinerary = (suggestion: ActivitySuggestion, distance: number | null) => {
     setItinerary((prev) => [...prev, { ...suggestion, activityType, distance }]);
   };
@@ -303,19 +243,7 @@ export default function HolidayPlannerPage() {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     required
-                    className="pr-10"
                   />
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                    onClick={handleDetectLocation}
-                    disabled={isLocating}
-                    aria-label="Detect current location"
-                  >
-                    {isLocating ? <Loader2 className="h-4 w-4 animate-spin"/> : <LocateFixed className="h-4 w-4" />}
-                  </Button>
                 </div>
               </div>
               <div className="md:col-span-1 space-y-2">
@@ -515,7 +443,7 @@ export default function HolidayPlannerPage() {
              <div className="mt-16 text-center">
                  <h2 className="text-3xl font-headline font-bold mb-4">Your Itinerary</h2>
                  <Card className="max-w-3xl mx-auto p-8 text-center">
-                    <p className="text-muted-foreground">Enter a location or use the locate button to get started. Your planned activities will appear here.</p>
+                    <p className="text-muted-foreground">Enter a location to get started. Your planned activities will appear here.</p>
                  </Card>
              </div>
            )
